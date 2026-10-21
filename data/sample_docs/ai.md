@@ -1,1 +1,0 @@
-Hello! This is for the testing purpose and learning the new tech.
