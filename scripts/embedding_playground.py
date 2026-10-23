@@ -20,7 +20,7 @@ print("Similarity matrix:\n", np.round(vectors @ vectors.T, 2))
 chunks = chunk_documents(load_directory(Path("data/sample_docs")))
 chunk_vectors = embed_texts([c.text for c in chunks])
 
-question = "Write a question about your sample PDF here"
+question = "How do I declare a path parameter with a type?"
 scores = chunk_vectors @ embed_query(question)       # one score per chunk
 top = np.argsort(scores)[::-1][:3]                   # 3 highest scores
 
