@@ -40,7 +40,7 @@ It must be honest, well-tested, measured, and explainable in an interview.
    a phase prompt explicitly asks (a framework comparison comes late, as a demo).
 8. **Small steps.** One phase at a time. Don't start the next phase unasked.
 
-## 4. Current architecture (Stages 1–5 are DONE)
+## 4. Current architecture (Stages 1–6 are built)
 
 ```
 INGESTION (scripts/build_index.py)          QUERY
@@ -48,7 +48,9 @@ data/sample_docs/*.pdf|md|txt               question
   → app/ingestion/loader.py   (pypdf,        → app/retrieval/embedder.py (embed_query)
        one Document per PDF page)            → app/retrieval/vector_store.py (FAISS search)
   → app/ingestion/cleaning.py (regex)        → top-k Chunks with source/page metadata
-  → app/ingestion/chunking.py (500/100)      → [Phase 6] grounded prompt → Ollama → answer + citations
+  → app/ingestion/chunking.py (500/100)      → app/services/rag_service.py: score gate (MIN_SCORE)
+                                                → app/generation/prompts.py → llm_client.py (Ollama)
+                                                → app/generation/citations.py (validate) → RAGAnswer
   → app/retrieval/embedder.py (MiniLM)
   → app/retrieval/vector_store.py
        storage/index/index.faiss + chunks.json
@@ -63,6 +65,9 @@ Existing public APIs (do not break):
   `chunk_documents(docs, ...)` — metadata gains `chunk_index`, `char_count`.
 - `embedder.MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"` (384-d,
   normalized float32), `get_model()`, `embed_texts()`, `embed_query()`.
+- `config.Settings.from_env()`; `llm_client.LLMClient` / `OllamaClient` / `FakeLLMClient`,
+  `LLMUnavailableError`, `LLMResponseError`; `citations.citation_tag/extract_citations/validate_citations`;
+  `RAGService(store, llm, settings).answer(question, top_k=None) -> RAGAnswer`.
 - `vector_store.VectorStore.build(chunks)`, `.search(query, k) -> [(Chunk, score)]`,
   `.save(folder)`, `.load(folder)` (rejects index built with another model).
 
@@ -115,7 +120,7 @@ source .venv/bin/activate                       # always
 python -m pytest -q                             # all tests
 python -m scripts.build_index                   # rebuild FAISS index
 python -m scripts.search "question" -k 3        # retrieval only
-python -m scripts.ask "question"                # [Phase 6] full RAG answer
+python -m scripts.ask "question"                # full RAG answer (needs Ollama running)
 uvicorn app.api.main:app --reload               # [Phase 7] API on :8000
 streamlit run ui/streamlit_app.py               # [Phase 8] UI
 python -m evaluation.run_eval                   # [Phase 9] evaluation

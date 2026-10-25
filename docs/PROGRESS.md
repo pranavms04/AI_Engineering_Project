@@ -11,7 +11,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 4 | Embeddings (MiniLM) | ✅ done | 4 | `tests/test_embedder.py` existed on disk but was never committed |
 | 5 | FAISS vector store + search CLI | ✅ done (rebuilt in Phase 0) | 7 | code was missing from the repo; recreated `vector_store.py`, `build_index`, `search` |
 | 0 | Audit + stabilise | ✅ done | 21 total | .gitignore, pinned requirements, .env.example, README stub |
-| 6 | Local LLM answers + citations | ⏭ next | | |
+| 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
 | 7 | FastAPI backend | ⬜ | | |
 | 8 | Streamlit UI | ⬜ | | |
 | 9 | Evaluation | ⬜ | | |
@@ -21,7 +21,7 @@ Record only facts: what exists, what passed, real measured numbers.
 ## Environment facts
 - macOS, Python 3.11.7, `.venv`
 - Chip / RAM: Apple M1 (arm64), 8 GB RAM (`sysctl hw.memsize` = 8589934592)
-- Ollama model: _chosen in Phase 6_
+- Ollama 0.40.4 (Homebrew, run with `ollama serve`), model `llama3.2:3b`, digest a80c4f17acd5, 1.9 GB on disk
 
 ## Measured numbers (only real ones)
 Phase 0 run (2026-10-23), docs = `fastapi-path-params.pdf` + `active.txt`:
@@ -29,6 +29,17 @@ Phase 0 run (2026-10-23), docs = `fastapi-path-params.pdf` + `active.txt`:
 - `search "How do I declare a path parameter with a type?"`: top-3 =
   0.555 [fastapi-path-params.pdf, p. 6], 0.470 [p. 1], 0.468 [p. 12].
   505 ms, which includes loading MiniLM on the first query (not warm latency).
+Phase 6 run (2026-10-23), Ollama NOT running:
+- `ask "What is the capital of France?"`: abstained without calling the LLM; best score 0.120 < MIN_SCORE 0.30.
+  retrieve=3836 ms (includes first-time MiniLM load), generate=0 ms, total=3839 ms.
+- `ask "How do I declare a path parameter with a type?"`: `LLM error: Cannot reach Ollama ... Is it running?` (graceful failure).
+
+Phase 6 run (2026-10-24), Ollama running, llama3.2:3b, prompt v1:
+- `ask "How do I declare a path parameter with a type?"`: cold generate=14076 ms (total 15144 ms); warm generate=1465 ms (total 2842 ms).
+  Retrieve 1066–1375 ms, mostly MiniLM loading in a new process.
+- Answer text came from p. 1 but cited `[fastapi-path-params.pdf, p. 2]`, which was not retrieved → reported in `invalid_citations`.
+  Same answer and same wrong citation in an earlier run on 2026-10-23 (Ollama 0.40.9 app). Suspected cause: prompt's example tag `[guide.pdf, p. 2]` (untested).
+- `ask "What is the capital of France?"`: abstained, best score 0.120, LLM not called, total=1369 ms.
 - Note: the p. 1 chunk is arguably the best answer but ranks 2nd — a reason to measure retrieval in Phase 9.
 
 ## Bugs fixed (learning log)
@@ -36,4 +47,7 @@ Phase 0 run (2026-10-23), docs = `fastapi-path-params.pdf` + `active.txt`:
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
 - pytest collected only 5 tests: missing `test_*.py` files.
 - Phase 0: Stage 5 code (`app/retrieval/vector_store.py`, `scripts/build_index.py`, `scripts/search.py`) was not in the repo; recreated with 7 tests.
+- Phase 6: first pull failed with `no space left on device`; later the Ollama app and models were removed, so Ollama was reinstalled with Homebrew. A network drop stalled the pull once; restarting it resumed.
+- Phase 6: llama3.2:3b wrote a wrong page number in a citation; `validate_citations` caught it. Prompt fix not done yet.
+- Phase 6: `ollama pull` was reported done but Ollama was not installed on this Mac; the CLI fails with a clear message instead of a stack trace.
 - Phase 0: a personal PDF (`abouv-certificate_copy.pdf`) and `active.txt` were tracked in Git and pushed to GitHub; `.gitignore` now excludes `data/sample_docs/*` and `storage/`.

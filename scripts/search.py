@@ -2,15 +2,10 @@ import argparse
 import time
 from pathlib import Path
 
+from app.generation.citations import citation_tag
 from app.retrieval.vector_store import VectorStore
 
 INDEX_DIR = Path("storage/index")
-
-
-def citation_tag(metadata: dict) -> str:
-    if "page" in metadata:
-        return f"[{metadata['source']}, p. {metadata['page']}]"
-    return f"[{metadata['source']}]"
 
 
 def main() -> None:
