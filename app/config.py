@@ -17,6 +17,7 @@ class Settings:
     temperature: float = 0.1
     index_dir: Path = Path("storage/index")
     docs_dir: Path = Path("data/sample_docs")
+    max_upload_mb: int = 10
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -30,4 +31,5 @@ class Settings:
             temperature=float(_env("TEMPERATURE", str(defaults.temperature))),
             index_dir=Path(_env("INDEX_DIR", str(defaults.index_dir))),
             docs_dir=Path(_env("DOCS_DIR", str(defaults.docs_dir))),
+            max_upload_mb=int(_env("MAX_UPLOAD_MB", str(defaults.max_upload_mb))),
         )

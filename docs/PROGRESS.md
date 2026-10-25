@@ -12,7 +12,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 5 | FAISS vector store + search CLI | ✅ done (rebuilt in Phase 0) | 7 | code was missing from the repo; recreated `vector_store.py`, `build_index`, `search` |
 | 0 | Audit + stabilise | ✅ done | 21 total | .gitignore, pinned requirements, .env.example, README stub |
 | 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
-| 7 | FastAPI backend | ⬜ | | |
+| 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
 | 8 | Streamlit UI | ⬜ | | |
 | 9 | Evaluation | ⬜ | | |
 | 10 | Docker, CI, README | ⬜ | | |
@@ -42,6 +42,15 @@ Phase 6 run (2026-10-24), Ollama running, llama3.2:3b, prompt v1:
 - `ask "What is the capital of France?"`: abstained, best score 0.120, LLM not called, total=1369 ms.
 - Note: the p. 1 chunk is arguably the best answer but ranks 2nd — a reason to measure retrieval in Phase 9.
 
+Phase 7 run (2026-10-25), API via uvicorn on 127.0.0.1:8000, llama3.2:3b, prompt v1:
+- `GET /health`: `{"status":"ok","index_loaded":true,"chunks":35,"llm_reachable":true,"model":"llama3.2:3b"}`.
+- `POST /ask` path-parameter question: first request 12482 ms (cold Ollama + MiniLM, from middleware log);
+  next 2649 ms total (retrieve 638.7, generate 2009.1); later run 3296 ms. Same p. 2 invalid citation as Phase 6.
+- `POST /ask` France question: abstained, total 134.8 ms (retrieve warm: MiniLM stays loaded in the server).
+- `POST /ask` blank question → 422 in 6.8 ms. `.exe` upload → 415. `../../wifi-notes.md` saved as `wifi-notes.md` in DOCS_DIR; re-upload → 409.
+- `POST /index/rebuild` with one extra invented note: 15 documents → 36 chunks in 2.22 s; then `/ask` about it answered with a valid `[wifi-notes.md]` citation (top score 0.7545).
+  Test note deleted and index rebuilt afterwards (14 documents, 35 chunks, 1.98 s).
+
 ## Bugs fixed (learning log)
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
@@ -50,4 +59,5 @@ Phase 6 run (2026-10-24), Ollama running, llama3.2:3b, prompt v1:
 - Phase 6: first pull failed with `no space left on device`; later the Ollama app and models were removed, so Ollama was reinstalled with Homebrew. A network drop stalled the pull once; restarting it resumed.
 - Phase 6: llama3.2:3b wrote a wrong page number in a citation; `validate_citations` caught it. Prompt fix not done yet.
 - Phase 6: `ollama pull` was reported done but Ollama was not installed on this Mac; the CLI fails with a clear message instead of a stack trace.
+- Phase 7: `POST /index/rebuild` returned 500 when DOCS_DIR did not exist (`FileNotFoundError` from `iterdir`); found by a test, fixed with an `is_dir()` check → 400.
 - Phase 0: a personal PDF (`abouv-certificate_copy.pdf`) and `active.txt` were tracked in Git and pushed to GitHub; `.gitignore` now excludes `data/sample_docs/*` and `storage/`.

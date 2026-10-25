@@ -107,3 +107,18 @@ def test_malformed_reply_becomes_llm_response_error():
     client = make_client(lambda request: httpx.Response(200, json={"unexpected": True}))
     with pytest.raises(LLMResponseError):
         client.generate("sys", "user")
+
+
+def test_is_reachable_true_when_tags_endpoint_answers():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/api/tags"
+        return httpx.Response(200, json={"models": []})
+
+    assert make_client(handler).is_reachable() is True
+
+
+def test_is_reachable_false_when_ollama_is_down():
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("connection refused")
+
+    assert make_client(handler).is_reachable() is False

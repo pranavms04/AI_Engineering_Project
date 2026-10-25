@@ -21,11 +21,17 @@ class LLMClient(Protocol):
 
     def generate(self, system: str, prompt: str) -> str: ...
 
+    def is_reachable(self) -> bool: ...
+
+
+HEALTH_TIMEOUT_S = 2.0
+
 
 class OllamaClient:
     def __init__(self, settings: Settings, http_client: httpx.Client | None = None):
         self.model = settings.ollama_model
         self.url = f"{settings.ollama_url}/api/chat"
+        self.tags_url = f"{settings.ollama_url}/api/tags"
         self.temperature = settings.temperature
         self.http = http_client or httpx.Client(timeout=settings.llm_timeout_s)
 
@@ -60,15 +66,27 @@ class OllamaClient:
             raise LLMResponseError("Ollama returned an empty answer")
         return content.strip()
 
+    def is_reachable(self) -> bool:
+        """Quick check used by /health. Never raises."""
+        try:
+            response = self.http.get(self.tags_url, timeout=HEALTH_TIMEOUT_S)
+        except httpx.HTTPError:
+            return False
+        return response.status_code == 200
+
 
 class FakeLLMClient:
     """Test double: returns a canned answer and remembers what it was asked."""
 
-    def __init__(self, answer: str = "", model: str = "fake-llm"):
+    def __init__(self, answer: str = "", model: str = "fake-llm", reachable: bool = True):
         self.answer = answer
         self.model = model
+        self.reachable = reachable
         self.calls: list[tuple[str, str]] = []
 
     def generate(self, system: str, prompt: str) -> str:
         self.calls.append((system, prompt))
         return self.answer
+
+    def is_reachable(self) -> bool:
+        return self.reachable
