@@ -58,8 +58,14 @@ def _to_source(chunk: Chunk, score: float) -> Source:
     )
 
 
+def _normalize(text: str) -> str:
+    return " ".join(text.split()).lower().rstrip(".")
+
+
 def _is_abstain(answer: str) -> bool:
-    return ABSTAIN_ANSWER.lower().rstrip(".") in answer.lower()
+    # The whole answer must be the refusal. An invented answer that merely ends with
+    # the refusal sentence (seen in evaluation, q29) is an answer, not a refusal.
+    return _normalize(answer) == _normalize(ABSTAIN_ANSWER)
 
 
 def _ms(start: float) -> float:

@@ -14,7 +14,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
 | 8 | Streamlit UI | ✅ done | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
-| 9 | Evaluation | ✅ done | 115 total (+24) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
+| 9 | Evaluation | ✅ done | 123 total (+24, +8 follow-up) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
 | 10 | Docker, CI, README | ⬜ | | |
 | 11 | Interview prep pack | ⬜ | | |
 
@@ -73,6 +73,12 @@ Details and file names: `evaluation/README.md`. Config: chunk 500/100, top_k 4, 
 - MIN_SCORE sweep (gate): no threshold separates classes (q18 answerable and q25 should-abstain both 0.2778; q26–q29 score 0.45–0.59).
   Tested 0.20 with the LLM (2 runs): q21 fixed, but q18 became wrong and q25 invented. Kept 0.30.
 
+Phase 9 follow-up (2026-10-25): `_is_abstain` and citation pattern fixed (see Bugs). 123 tests.
+- Re-scored baseline answers (no LLM): citation accuracy 0.789 / 0.864 / 0.905; abstention TP 5 / 5 / 5 of 6.
+- 3 fresh runs: citation accuracy 0.870 / 0.905 / 0.895; final abstention P/R = strict P/R in every run
+  (0.625/0.833, 0.556/0.833, 0.625/0.833); remaining invalid citations are real wrong pages (q01 p. 2, q06 p. 4, q08 p. 7 once).
+  Latency p50 5905 / 5173 / 7359 ms: not comparable to baseline (Mac also running a browser and a web server).
+
 ## Bugs fixed (learning log)
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
@@ -81,8 +87,8 @@ Details and file names: `evaluation/README.md`. Config: chunk 500/100, top_k 4, 
 - Phase 6: first pull failed with `no space left on device`; later the Ollama app and models were removed, so Ollama was reinstalled with Homebrew. A network drop stalled the pull once; restarting it resumed.
 - Phase 6: llama3.2:3b wrote a wrong page number in a citation; `validate_citations` caught it. Prompt fix not done yet.
 - Phase 6: `ollama pull` was reported done but Ollama was not installed on this Mac; the CLI fails with a clear message instead of a stack trace.
-- Phase 9: evaluation found the app's `_is_abstain` uses a substring match — an invented answer ending with the refusal sentence counts as abstained (q29). Added strict abstention to the eval; app fix is a follow-up.
-- Phase 9: citation regex matches code like `[user.value]` as a citation (q09). Follow-up.
+- Phase 9: evaluation found the app's `_is_abstain` uses a substring match — an invented answer ending with the refusal sentence counts as abstained (q29). **Fixed (Phase 9 follow-up):** the whole answer must be the refusal sentence.
+- Phase 9: citation regex matches code like `[user.value]` as a citation (q09). **Fixed (Phase 9 follow-up):** only `.pdf`/`.md`/`.txt` tags (from `SUPPORTED_SUFFIXES`) count. Re-scoring the saved baseline answers: run 1 citation accuracy 0.750 → 0.789 and refusals 6/6 → 5/6; run 2 0.826 → 0.864; run 3 unchanged (0.905).
 - Phase 8: disk at 1.7 GB free again (Gradle cache regrew to 8.3 GB); cleared before installing Streamlit. First `pip install` hit a PyPI read timeout; retried with `--timeout 120 --retries 10`.
 - Phase 8: security review found Streamlit listening on all interfaces by default → `server.address = "localhost"`; and LLM Markdown could load attacker image URLs → `remove_images()`.
 - Phase 7: `POST /index/rebuild` returned 500 when DOCS_DIR did not exist (`FileNotFoundError` from `iterdir`); found by a test, fixed with an `is_dir()` check → 400.

@@ -153,7 +153,37 @@ def test_strict_abstention_is_reported_with_llm(setup):
     _config, summary, rows, _ = run(settings, dataset, with_llm=True, llm=FakeLLMClient(invented), out_dir=None)
 
     q3 = next(r for r in rows if r["id"] == "q3")
-    assert q3["abstained"] is True  # the app's loose check is fooled
-    assert q3["clean_abstained"] is False  # the strict check is not
-    assert summary["llm"]["abstention"]["recall"] == 1.0
+    # The app's own check was loose before the q29 fix; now it agrees with the strict check.
+    assert q3["abstained"] is False
+    assert q3["clean_abstained"] is False
+    assert summary["llm"]["abstention"]["recall"] == 0.0
     assert summary["llm"]["strict_abstention"]["recall"] == 0.0
+
+
+def test_rescore_applies_current_checks_to_saved_answers(tmp_path):
+    from evaluation.rescore import rescore
+
+    def q(id_, answer, should_abstain, retrieved):
+        return {"id": id_, "answer": answer, "should_abstain": should_abstain, "retrieved": retrieved}
+
+    pdf = [["guide.pdf", 1, 0.6]]
+    saved = {
+        "config": {"top_k": 4},
+        "summary": {"llm": {
+            "citation_accuracy": 0.5, "answers_with_invalid_citation": 1,
+            "abstention": {"precision": 1.0, "recall": 1.0, "true_positives": 1},
+        }},
+        "questions": [
+            # Code that the old pattern counted as an invalid citation.
+            q("a", "Use it [guide.pdf, p. 1]:\n    return [user.value]", False, pdf),
+            # An invented answer ending with the refusal: the old check counted it as abstained.
+            q("b", "Run docker build.\n\nI couldn't find this in the documents.", True, pdf),
+        ],
+    }
+    path = tmp_path / "run-llm.json"
+    path.write_text(json.dumps(saved), encoding="utf-8")
+
+    result = rescore(path)
+    assert result["citation_accuracy"] == (0.5, 1.0)
+    assert result["answers_with_invalid_citation"] == (1, 0)
+    assert result["abstention_true_positives"] == (1, 0)

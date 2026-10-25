@@ -67,7 +67,43 @@ the refusal sentence and was counted as a refusal. The strict check was added af
 Consistent in all 3 runs: q01 cites p. 2 (not retrieved; text is from p. 1), q06 cites p. 4 (not
 retrieved), q02 is refused by the LLM although p. 2 answers it, q18 and q21 are refused by the gate,
 q29 gets an invented Docker answer, q25–q28 and q30 are refused. One "invalid citation" in runs 1–2
-(`[user.value]` in q09) is code, not a citation — the citation regex matches `[name.ext]`.
+(`[user.value]` in q09) is code, not a citation — the citation regex matched `[name.ext]`.
+
+## Follow-up — two bugs fixed (2026-10-25)
+
+Both were found by this evaluation:
+
+1. **Refusal check too loose.** `_is_abstain` counted any answer *containing* the refusal sentence,
+   so q29's invented Docker answer (ending with the sentence) counted as a refusal. Now the whole
+   answer must be the refusal (spacing, case and the final full stop are ignored).
+2. **Code read as a citation.** The pattern accepted any `[name.ext]`, so `return [user.value]`
+   counted as an invalid citation. Now only `.pdf`, `.md` and `.txt` tags count (the types the app can index).
+
+**Re-scored baseline** (same saved answers, new checks, no LLM calls:
+`python -m evaluation.rescore evaluation/results/20261025-22{0558,0910,1228}-llm-c500o100.json`).
+Any change here comes only from the fixes:
+
+| Run | Citation accuracy | Answers with invalid citation | Abstention TP (of 6) |
+|---|---|---|---|
+| `20261025-220558` | 0.750 → 0.789 | 5 → 4 | 6 → 5 |
+| `20261025-220910` | 0.826 → 0.864 | 4 → 3 | 5 → 5 |
+| `20261025-221228` | 0.905 → 0.905 | 2 → 2 | 5 → 5 |
+
+**Three fresh runs with the fixed code** (same config, dataset and index; commit `d1fa3f6` + the fix):
+
+| Run | Keyword cov. | Citation acc. | Answers w/ invalid citation | Final abstention P / R | Strict abstention P / R | Total p50 / p95 (ms) |
+|---|---|---|---|---|---|---|
+| `20261025-230001` | 0.736 | 0.870 | 3 | 0.625 / 0.833 | 0.625 / 0.833 | 5905 / 16452 |
+| `20261025-230404` | 0.694 | 0.905 | 2 | 0.556 / 0.833 | 0.556 / 0.833 | 5173 / 19869 |
+| `20261025-230830` | 0.736 | 0.895 | 2 | 0.625 / 0.833 | 0.625 / 0.833 | 7359 / 18777 |
+
+- The app's own abstention numbers now equal the strict ones in every run: the check is fixed.
+- Every remaining invalid citation is a real wrong page: q01 → p. 2 (all 3 runs), q06 → p. 4 (all 3), q08 → p. 7 (once).
+- Fresh citation accuracy (0.870–0.905) overlaps the re-scored baseline (0.789–0.905). Treat it as
+  "the same model behaviour, now measured correctly", not as a model improvement.
+- Recall@4 is unchanged at 0.958 (retrieval was not touched).
+- Latency is higher than the baseline runs, but not comparable: during these runs the Mac was also
+  running a browser and a local web server.
 
 ## Experiment 1 — chunk size (retrieval only, same dataset)
 

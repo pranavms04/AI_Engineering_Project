@@ -57,6 +57,30 @@ def test_llm_saying_it_cannot_answer_is_marked_abstained():
     assert service.answer("Something tangential?").abstained is True
 
 
+@pytest.mark.parametrize(
+    "answer",
+    [ABSTAIN_ANSWER, "  i couldn't find this in the documents  ", "I couldn't find this\nin the documents."],
+)
+def test_refusal_with_spacing_or_case_differences_is_abstained(answer):
+    service, _llm = make_service(score=0.6, answer=answer)
+    assert service.answer("Something tangential?").abstained is True
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        # Real shape from evaluation q29: an invented answer that ends with the refusal sentence.
+        "To deploy with Docker, run:\n\n```bash\ndocker run -p 8000:8000 my-fastapi-app\n```\n\n" + ABSTAIN_ANSWER,
+        "Partly: " + ABSTAIN_ANSWER + " But try item_id: int [fastapi.pdf, p. 2].",
+    ],
+)
+def test_answer_that_only_contains_the_refusal_is_not_abstained(answer):
+    service, _llm = make_service(score=0.6, answer=answer)
+    result = service.answer("How do I deploy with Docker?")
+    assert result.abstained is False
+    assert result.answer == answer
+
+
 def test_invented_citation_is_reported():
     service, _llm = make_service(score=0.6, answer="It is in [other.pdf, p. 5].")
     assert service.answer("Where is it?").invalid_citations == ["[other.pdf, p. 5]"]

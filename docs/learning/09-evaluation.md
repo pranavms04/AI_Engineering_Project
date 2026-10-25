@@ -188,8 +188,8 @@ Tests: `python -m pytest -q` → **115 passed** (91 before + 24 new: 12 metrics,
 | `dataset.jsonl:7: missing keys [...]` | A line lacks a field | Fix that line; the message gives the line number |
 | `answerable question needs expected_sources` | Forgot the answer key | Add pages, or set `should_abstain: true` |
 | Different numbers on identical runs (**hit in this phase**: citation accuracy 0.750 → 0.826 → 0.905) | LLM randomness | Run several times; report the range |
-| Abstention recall 1.000 that looked too good (**hit in this phase**) | App counts any answer *containing* the refusal sentence | Use the strict abstention row; fix `_is_abstain` (follow-up) |
-| `[user.value]` reported as an invalid citation (**hit in this phase**) | Citation regex matches `[name.ext]`, so Python code looks like a file citation | Mentally subtract; tighten the regex (follow-up) |
+| Abstention recall 1.000 that looked too good (**hit in this phase**) | App counted any answer *containing* the refusal sentence | **Fixed in the follow-up:** `_is_abstain` now requires the whole answer to be the refusal |
+| `[user.value]` reported as an invalid citation (**hit in this phase**) | Citation regex matched any `[name.ext]`, so Python code looked like a file citation | **Fixed in the follow-up:** only `.pdf`/`.md`/`.txt` tags count |
 | `for cfg in "300 100" ...; set -- $cfg` did nothing (**hit in this phase**) | zsh doesn't split words like bash | Run each command separately |
 
 ## 8. Security and limits
@@ -229,7 +229,32 @@ Tests: `python -m pytest -q` → **115 passed** (91 before + 24 new: 12 metrics,
    Run identical configs several times and report the range (citation accuracy 0.750–0.905 over 3 runs); never claim an improvement smaller than that spread.
 
 8. **What would you improve next?**
-   A v2 prompt whose citation example isn't a real-looking page (the model copies `[guide.pdf, p. 2]` → q01 cites p. 2 every run); fix the abstain check and the citation regex; grow the dataset with a second annotator.
+   A v2 prompt whose citation example isn't a real-looking page (the model copies `[guide.pdf, p. 2]` → q01 cites p. 2 every run); grow the dataset with a second annotator. (The abstain check and the citation regex are fixed: see below.)
+
+9. **You found bugs with your evaluation. How did you prove the fix worked?**
+   Two ways. First, I re-scored the *saved* answers with the fixed code (`evaluation/rescore.py`), so the model's randomness was taken out: run 1's citation accuracy went 0.750 → 0.789 and its refusals 6 → 5 of 6, and run 3, which had neither problem, did not change at all. Then three fresh runs showed the app's refusal count equal to the strict count in every run.
+
+### Follow-up: two bugs fixed
+
+| Bug | Before | After | Test |
+|---|---|---|---|
+| Refusal check | `ABSTAIN_ANSWER in answer` (substring) | whole answer must equal the refusal, ignoring spacing/case/full stop | real q29 shape: Docker steps + refusal → not abstained |
+| Citation pattern | any `[name.ext]` | only `.pdf` `.md` `.txt` (from `SUPPORTED_SUFFIXES`), any case | real q09 code `return [user.value]` → no citation |
+
+```python
+def _is_abstain(answer: str) -> bool:
+    return _normalize(answer) == _normalize(ABSTAIN_ANSWER)
+```
+- `_normalize` joins whitespace, lowercases and drops the final full stop, so harmless formatting
+  still counts as a refusal, but extra text does not.
+
+```python
+_EXTENSIONS = "|".join(sorted(suffix.lstrip(".") for suffix in SUPPORTED_SUFFIXES))
+CITATION_PATTERN = re.compile(rf"...\.(?:{_EXTENSIONS}))...", re.IGNORECASE)
+```
+- The allowed extensions come from the loader, so adding a file type later updates citations too.
+
+Numbers: `evaluation/README.md`, section "Follow-up — two bugs fixed".
 
 ## 10. Try it yourself
 

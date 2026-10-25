@@ -40,6 +40,18 @@ def test_extract_citations_ignores_code_indexing():
     assert extract_citations("Use items[0] or data[key.name] in code.") == []
 
 
+def test_extract_citations_ignores_code_that_looks_like_a_file():
+    # Real answer text from evaluation q09: code, not a citation.
+    code = 'async def read_users(user: User):\n    return [user.value]\n'
+    assert extract_citations(code) == []
+    assert extract_citations("Settings live in [config.yaml].") == []
+
+
+def test_extract_citations_accepts_any_case_supported_extension():
+    answer = "See [Guide.PDF, p. 3], [notes.md] and [README.TXT]."
+    assert extract_citations(answer) == ["[Guide.PDF, p. 3]", "[notes.md]", "[README.TXT]"]
+
+
 def test_validate_accepts_retrieved_sources():
     valid, invalid = validate_citations("Typed [fastapi.pdf, p. 2] and pip [python.md].", RETRIEVED)
     assert valid == ["[fastapi.pdf, p. 2]", "[python.md]"]

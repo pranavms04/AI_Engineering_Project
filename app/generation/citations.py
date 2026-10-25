@@ -1,9 +1,15 @@
 import re
 
 from app.ingestion.chunking import Chunk
+from app.ingestion.loader import SUPPORTED_SUFFIXES
 
-# Matches [file.ext] or [file.ext, p. 3], but not list indexing like items[0].
-CITATION_PATTERN = re.compile(r"(?<![\w\]])\[([^\[\],]+\.\w+)(?:,\s*p\.\s*(\d+))?\]")
+# Only extensions the app can index can be cited, so code like `[user.value]` is not a citation.
+_EXTENSIONS = "|".join(sorted(suffix.lstrip(".") for suffix in SUPPORTED_SUFFIXES))
+
+# Matches [file.pdf] or [file.pdf, p. 3], but not list indexing like items[0].
+CITATION_PATTERN = re.compile(
+    rf"(?<![\w\]])\[([^\[\],]+\.(?:{_EXTENSIONS}))(?:,\s*p\.\s*(\d+))?\]", re.IGNORECASE
+)
 
 
 def citation_tag(metadata: dict) -> str:

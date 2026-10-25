@@ -18,7 +18,8 @@
   var dateOnly = function (iso) { return String(iso).slice(0, 10); };
 
   /* ---------- citations: a port of app/generation/citations.py ---------- */
-  var CITATION = /(?<![\w\]])\[([^\[\],]+\.\w+)(?:,\s*p\.\s*(\d+))?\]/g;
+  // Only extensions the app can index (.md .pdf .txt), so code like [user.value] is not a citation.
+  var CITATION = /(?<![\w\]])\[([^\[\],]+\.(?:md|pdf|txt))(?:,\s*p\.\s*(\d+))?\]/gi;
   function citationTag(source, page) { return page == null ? "[" + source + "]" : "[" + source + ", p. " + page + "]"; }
   function extractCitations(answer) {
     var tags = [], m;
