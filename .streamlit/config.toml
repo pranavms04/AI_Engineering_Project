@@ -1,0 +1,13 @@
+[server]
+# Only this computer can open the UI (Streamlit's default listens on every network interface).
+address = "localhost"
+# Match the API's 10 MB upload limit (MAX_UPLOAD_MB) so the browser refuses big files early.
+maxUploadSize = 10
+
+[client]
+# Hide the "Deploy" button (it is for Streamlit's cloud hosting; this app stays local).
+toolbarMode = "minimal"
+
+[browser]
+# Keep the app private: don't send usage statistics to Streamlit.
+gatherUsageStats = false

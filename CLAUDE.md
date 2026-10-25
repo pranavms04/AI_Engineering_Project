@@ -40,7 +40,7 @@ It must be honest, well-tested, measured, and explainable in an interview.
    a phase prompt explicitly asks (a framework comparison comes late, as a demo).
 8. **Small steps.** One phase at a time. Don't start the next phase unasked.
 
-## 4. Current architecture (Stages 1–7 are built)
+## 4. Current architecture (Stages 1–8 are built)
 
 ```
 INGESTION (scripts/build_index.py)          QUERY
@@ -71,6 +71,8 @@ Existing public APIs (do not break):
   `LLMClient.is_reachable()`; `indexing.rebuild_index(docs_dir, index_dir) -> (VectorStore, IndexStats)`.
 - API (`app/api/`): `main.app` with GET /health, POST /ask, GET+POST /documents, POST /index/rebuild;
   shared `AppState` via `Depends(get_state)` (tests override it); CORS only localhost:8501.
+- UI (`ui/streamlit_app.py`): calls the API over HTTP only (`API_URL`); helpers `call_api` → `ApiResult`,
+  `remove_images()` before rendering LLM Markdown; `.streamlit/config.toml` binds to localhost.
 - `vector_store.VectorStore.build(chunks)`, `.search(query, k) -> [(Chunk, score)]`,
   `.save(folder)`, `.load(folder)` (rejects index built with another model).
 
@@ -124,8 +126,9 @@ python -m pytest -q                             # all tests
 python -m scripts.build_index                   # rebuild FAISS index
 python -m scripts.search "question" -k 3        # retrieval only
 python -m scripts.ask "question"                # full RAG answer (needs Ollama running)
-uvicorn app.api.main:app --reload               # API on 127.0.0.1:8000, docs at /docs
-streamlit run ui/streamlit_app.py               # [Phase 8] UI
+ollama serve                                    # terminal 1: local LLM
+uvicorn app.api.main:app --reload               # terminal 2: API on 127.0.0.1:8000, docs at /docs
+streamlit run ui/streamlit_app.py               # terminal 3: UI on http://localhost:8501
 python -m evaluation.run_eval                   # [Phase 9] evaluation
 ```
 

@@ -13,7 +13,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 0 | Audit + stabilise | ✅ done | 21 total | .gitignore, pinned requirements, .env.example, README stub |
 | 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
-| 8 | Streamlit UI | ⬜ | | |
+| 8 | Streamlit UI | ✅ done | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
 | 9 | Evaluation | ⬜ | | |
 | 10 | Docker, CI, README | ⬜ | | |
 | 11 | Interview prep pack | ⬜ | | |
@@ -51,6 +51,16 @@ Phase 7 run (2026-10-25), API via uvicorn on 127.0.0.1:8000, llama3.2:3b, prompt
 - `POST /index/rebuild` with one extra invented note: 15 documents → 36 chunks in 2.22 s; then `/ask` about it answered with a valid `[wifi-notes.md]` citation (top score 0.7545).
   Test note deleted and index rebuilt afterwards (14 documents, 35 chunks, 1.98 s).
 
+Phase 8 run (2026-10-25), Streamlit UI on 127.0.0.1:8501 → API → Ollama, llama3.2:3b, prompt v1 (timings from the UI caption):
+- Path-parameter question (cold): retrieve 3889 ms, generate 10430 ms, total 14320 ms. Same invalid p. 2 citation, shown as a yellow warning.
+- "What happens if I send a string to a path parameter declared as int?": retrieve 629, generate 7076, total 7706 ms.
+  Citation p. 2 is valid (retrieved, score 0.445), but the answer says FastAPI "will raise a ValueError"; p. 2 says it returns an HTTP error.
+  → Unfaithful claim with a valid citation: citation validation cannot catch this. Needs a faithfulness check in Phase 9.
+- "What is the capital of France?": abstained, retrieve 465, generate 0, total 466 ms (blue info box).
+- Ollama stopped → red "assistant is unavailable" with the API's 503 message; API stopped → "API offline" page with start command.
+- Rebuild from UI: 14 documents, 35 chunks in 2.94 s. Upload of an invented note → saved; second upload → "already exists" (409). Note deleted afterwards.
+- Streamlit install added 20 packages (all Apache-2.0/MIT/BSD); largest: pyarrow 127 MB, pandas 82 MB, streamlit 35 MB.
+
 ## Bugs fixed (learning log)
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
@@ -59,5 +69,7 @@ Phase 7 run (2026-10-25), API via uvicorn on 127.0.0.1:8000, llama3.2:3b, prompt
 - Phase 6: first pull failed with `no space left on device`; later the Ollama app and models were removed, so Ollama was reinstalled with Homebrew. A network drop stalled the pull once; restarting it resumed.
 - Phase 6: llama3.2:3b wrote a wrong page number in a citation; `validate_citations` caught it. Prompt fix not done yet.
 - Phase 6: `ollama pull` was reported done but Ollama was not installed on this Mac; the CLI fails with a clear message instead of a stack trace.
+- Phase 8: disk at 1.7 GB free again (Gradle cache regrew to 8.3 GB); cleared before installing Streamlit. First `pip install` hit a PyPI read timeout; retried with `--timeout 120 --retries 10`.
+- Phase 8: security review found Streamlit listening on all interfaces by default → `server.address = "localhost"`; and LLM Markdown could load attacker image URLs → `remove_images()`.
 - Phase 7: `POST /index/rebuild` returned 500 when DOCS_DIR did not exist (`FileNotFoundError` from `iterdir`); found by a test, fixed with an `is_dir()` check → 400.
 - Phase 0: a personal PDF (`abouv-certificate_copy.pdf`) and `active.txt` were tracked in Git and pushed to GitHub; `.gitignore` now excludes `data/sample_docs/*` and `storage/`.
