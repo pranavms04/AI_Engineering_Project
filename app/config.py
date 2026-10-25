@@ -18,6 +18,8 @@ class Settings:
     index_dir: Path = Path("storage/index")
     docs_dir: Path = Path("data/sample_docs")
     max_upload_mb: int = 10
+    chunk_size: int = 500
+    chunk_overlap: int = 100
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -32,4 +34,6 @@ class Settings:
             index_dir=Path(_env("INDEX_DIR", str(defaults.index_dir))),
             docs_dir=Path(_env("DOCS_DIR", str(defaults.docs_dir))),
             max_upload_mb=int(_env("MAX_UPLOAD_MB", str(defaults.max_upload_mb))),
+            chunk_size=int(_env("CHUNK_SIZE", str(defaults.chunk_size))),
+            chunk_overlap=int(_env("CHUNK_OVERLAP", str(defaults.chunk_overlap))),
         )

@@ -40,7 +40,7 @@ It must be honest, well-tested, measured, and explainable in an interview.
    a phase prompt explicitly asks (a framework comparison comes late, as a demo).
 8. **Small steps.** One phase at a time. Don't start the next phase unasked.
 
-## 4. Current architecture (Stages 1–8 are built)
+## 4. Current architecture (Stages 1–9 are built)
 
 ```
 INGESTION (scripts/build_index.py)          QUERY
@@ -71,6 +71,10 @@ Existing public APIs (do not break):
   `LLMClient.is_reachable()`; `indexing.rebuild_index(docs_dir, index_dir) -> (VectorStore, IndexStats)`.
 - API (`app/api/`): `main.app` with GET /health, POST /ask, GET+POST /documents, POST /index/rebuild;
   shared `AppState` via `Depends(get_state)` (tests override it); CORS only localhost:8501.
+- Evaluation (`evaluation/`): `dataset.jsonl` (30 questions, page-level ground truth, user-approved),
+  `metrics.py` (recall_at_k, mrr, keyword_coverage, citation_accuracy, abstention_scores, percentile),
+  `run_eval.py` (builds the index in memory, writes `results/*.json` with config + git commit). See `evaluation/README.md`.
+- `Settings` also has `chunk_size`/`chunk_overlap` (CHUNK_SIZE/CHUNK_OVERLAP, 500/100), used by API rebuild and build_index.
 - UI (`ui/streamlit_app.py`): calls the API over HTTP only (`API_URL`); helpers `call_api` → `ApiResult`,
   `remove_images()` before rendering LLM Markdown; `.streamlit/config.toml` binds to localhost.
 - `vector_store.VectorStore.build(chunks)`, `.search(query, k) -> [(Chunk, score)]`,
@@ -129,7 +133,10 @@ python -m scripts.ask "question"                # full RAG answer (needs Ollama 
 ollama serve                                    # terminal 1: local LLM
 uvicorn app.api.main:app --reload               # terminal 2: API on 127.0.0.1:8000, docs at /docs
 streamlit run ui/streamlit_app.py               # terminal 3: UI on http://localhost:8501
-python -m evaluation.run_eval                   # [Phase 9] evaluation
+python -m evaluation.run_eval                   # retrieval metrics (no LLM)
+python -m evaluation.run_eval --with-llm        # full RAG metrics + latency (needs Ollama)
+python -m evaluation.run_eval --chunk-size 300 --overlap 100   # one-variable experiment
+python -m evaluation.run_eval --sweep-min-score 0.2,0.3,0.4    # abstain-gate sweep
 ```
 
 ## 8. Known gotchas

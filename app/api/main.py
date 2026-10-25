@@ -113,7 +113,8 @@ def rebuild(state: AppState = Depends(get_state)) -> RebuildOut:
     if not state.rebuild_lock.acquire(blocking=False):
         raise HTTPException(409, "A rebuild is already running. Try again shortly.")
     try:
-        store, stats = rebuild_index(state.settings.docs_dir, state.settings.index_dir)
+        settings = state.settings
+        store, stats = rebuild_index(settings.docs_dir, settings.index_dir, settings.chunk_size, settings.chunk_overlap)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     finally:

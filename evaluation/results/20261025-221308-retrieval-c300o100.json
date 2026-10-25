@@ -1,0 +1,2031 @@
+{
+  "config": {
+    "date": "2026-10-25T22:13:08",
+    "git_commit": "5abc21e-dirty",
+    "with_llm": false,
+    "llm_model": null,
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunk_size": 300,
+    "chunk_overlap": 100,
+    "top_k": 4,
+    "min_score": 0.3,
+    "prompt_version": "v1",
+    "temperature": null,
+    "dataset": "evaluation/dataset.jsonl",
+    "chunks_in_index": 61,
+    "sources": [
+      "active.txt",
+      "fastapi-path-params.pdf"
+    ]
+  },
+  "summary": {
+    "questions": 30,
+    "answerable": 24,
+    "should_abstain": 6,
+    "recall@1": 0.7083333333333334,
+    "recall@3": 0.8333333333333334,
+    "recall@4": 0.875,
+    "recall@10": 1.0,
+    "mrr@10": 0.7937996031746032,
+    "gate_abstention": {
+      "precision": 0.3333333333333333,
+      "recall": 0.16666666666666666,
+      "true_positives": 1,
+      "false_positives": 2,
+      "false_negatives": 5
+    }
+  },
+  "min_score_sweep": null,
+  "questions": [
+    {
+      "id": "q01",
+      "question": "How do I declare a path parameter with a type?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          1
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.6081
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.5142
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5041
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4457
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4399
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4387
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4269
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.4219
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4189
+        ],
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.4116
+        ]
+      ],
+      "best_score": 0.6081,
+      "first_hit_rank": 8,
+      "gate_abstained": false
+    },
+    {
+      "id": "q02",
+      "question": "What does FastAPI return if I open /items/foo when item_id is declared as an int?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          2
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.7348
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.6919
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.6763
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.6308
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.5721
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5327
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5323
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.5117
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.5076
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.5057
+        ]
+      ],
+      "best_score": 0.7348,
+      "first_hit_rank": 3,
+      "gate_abstained": false
+    },
+    {
+      "id": "q03",
+      "question": "If I open /items/3, what type is the value my function receives?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          2
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.5722
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.4652
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.4315
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4302
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3787
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.3709
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3677
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3652
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.3404
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.2983
+        ]
+      ],
+      "best_score": 0.5722,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q04",
+      "question": "Where can I see the automatic interactive API documentation?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          3
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.6179
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.5431
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4845
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4618
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4368
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4262
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.347
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.2322
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2175
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.213
+        ]
+      ],
+      "best_score": 0.6179,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q05",
+      "question": "Which tool provides FastAPI's alternative API documentation, and at what URL?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          4
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.7774
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.7573
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.6689
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.6652
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.5712
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.5673
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.566
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5388
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5292
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5273
+        ]
+      ],
+      "best_score": 0.7774,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q06",
+      "question": "Which library performs the data validation in FastAPI?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          5
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.7503
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.6007
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5839
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5506
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5397
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.5218
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4817
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4638
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4595
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4556
+        ]
+      ],
+      "best_score": 0.7503,
+      "first_hit_rank": 5,
+      "gate_abstained": false
+    },
+    {
+      "id": "q07",
+      "question": "Why must /users/me be declared before /users/{user_id}?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          5
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.6384
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.6064
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4823
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4435
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4021
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.2757
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2669
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2409
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.2327
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.2309
+        ]
+      ],
+      "best_score": 0.6384,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q08",
+      "question": "What happens if I define the same path operation twice?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          5
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.5506
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4484
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4444
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4166
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4007
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.3696
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3631
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.3589
+        ],
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.3543
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.3436
+        ]
+      ],
+      "best_score": 0.5506,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q09",
+      "question": "How do I restrict a path parameter to a set of predefined values?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          6
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.544
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4915
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4853
+        ],
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.4596
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4291
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4262
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4209
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3758
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.3567
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3518
+        ]
+      ],
+      "best_score": 0.544,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q10",
+      "question": "Why should the Enum class also inherit from str?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          6
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.3982
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.393
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.3815
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.3672
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.3635
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.3572
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.3473
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.3053
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.2972
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.2891
+        ]
+      ],
+      "best_score": 0.3982,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q11",
+      "question": "What are AlexNet, ResNet and LeNet in the example?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          7
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.558
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4969
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.4725
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.444
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.3926
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.385
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.3648
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.3459
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.3129
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.2882
+        ]
+      ],
+      "best_score": 0.558,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q12",
+      "question": "How do I get the actual string value of an enum member like model_name?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          10
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.7272
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.6996
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.6845
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.6715
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.6005
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.591
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.5774
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.5724
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.539
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.539
+        ]
+      ],
+      "best_score": 0.7272,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q13",
+      "question": "What happens when I return enum members in a JSON response?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          11
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.5356
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4919
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4549
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.4547
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4525
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4465
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.441
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4187
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.3626
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.3226
+        ]
+      ],
+      "best_score": 0.5356,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q14",
+      "question": "How can a path parameter contain a whole file path like home/johndoe/myfile.txt?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          12
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.7021
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5727
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5703
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5531
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.445
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4429
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4003
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.3979
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.389
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3809
+        ]
+      ],
+      "best_score": 0.7021,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q15",
+      "question": "Does OpenAPI support path parameters that contain paths, and how does FastAPI handle it?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          12
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.7338
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.7116
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.6977
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.6913
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.6759
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.6545
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.6252
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.6168
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.6126
+        ],
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.6011
+        ]
+      ],
+      "best_score": 0.7338,
+      "first_hit_rank": 2,
+      "gate_abstained": false
+    },
+    {
+      "id": "q16",
+      "question": "What URL do I use if the file path starts with a slash?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          13
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5004
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4434
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.3828
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.3812
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3789
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3656
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.3359
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.3269
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3265
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.3241
+        ]
+      ],
+      "best_score": 0.5004,
+      "first_hit_rank": 4,
+      "gate_abstained": false
+    },
+    {
+      "id": "q17",
+      "question": "What message does the example return for the alexnet model?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          10
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.676
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.6165
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.6034
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.5959
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.581
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.553
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.5273
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.5139
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.4662
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4662
+        ]
+      ],
+      "best_score": 0.676,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q18",
+      "question": "Can a URL segment be limited to a fixed list of choices?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          6
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.2778
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.2417
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.2256
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.2239
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2232
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.2017
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.1993
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.1949
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.1819
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.1805
+        ]
+      ],
+      "best_score": 0.2778,
+      "first_hit_rank": 7,
+      "gate_abstained": true
+    },
+    {
+      "id": "q19",
+      "question": "My endpoint for the logged-in person keeps getting caught by the endpoint with a variable ID. How do I fix it?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          5
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3863
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3294
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3085
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3051
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.279
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.276
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.2497
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.2485
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2346
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.2219
+        ]
+      ],
+      "best_score": 0.3863,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q20",
+      "question": "What does the client receive when a typed URL value can't be converted, like a decimal where a whole number is expected?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          2
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4274
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3832
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3488
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3132
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.3115
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.2731
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.2521
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.2268
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.2153
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.1933
+        ]
+      ],
+      "best_score": 0.4274,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q21",
+      "question": "Which third-party component checks incoming values behind the scenes?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          5
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.2424
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.2389
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.224
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.2212
+        ],
+        [
+          "active.txt",
+          null,
+          0.1575
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.1498
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.1326
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.1325
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.1291
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.1249
+        ]
+      ],
+      "best_score": 0.2424,
+      "first_hit_rank": 2,
+      "gate_abstained": true
+    },
+    {
+      "id": "q22",
+      "question": "What two documentation interfaces does FastAPI generate, and at which URLs?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          3
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.7292
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.7275
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.7253
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.6361
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.5381
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5292
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5052
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.5032
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.49
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4855
+        ]
+      ],
+      "best_score": 0.7292,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q23",
+      "question": "How do I declare an enum path parameter and then compare or read its value?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          10
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.7615
+        ],
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.6972
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.5297
+        ],
+        [
+          "fastapi-path-params.pdf",
+          9,
+          0.5221
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4647
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4617
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4416
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4374
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4335
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4094
+        ]
+      ],
+      "best_score": 0.7615,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q24",
+      "question": "What benefits do Python type declarations give you in FastAPI?",
+      "should_abstain": false,
+      "expected": [
+        [
+          "fastapi-path-params.pdf",
+          13
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3
+        ]
+      ],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.6481
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.6004
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.5723
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5651
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.5057
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5035
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4793
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4223
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.418
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.4118
+        ]
+      ],
+      "best_score": 0.6481,
+      "first_hit_rank": 1,
+      "gate_abstained": false
+    },
+    {
+      "id": "q25",
+      "question": "How do I declare query parameters with default values?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          6,
+          0.3102
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2546
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.249
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.2443
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.2133
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.2088
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.2041
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.1914
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.1871
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.1776
+        ]
+      ],
+      "best_score": 0.3102,
+      "first_hit_rank": null,
+      "gate_abstained": false
+    },
+    {
+      "id": "q26",
+      "question": "How do I upload a file in FastAPI?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.6185
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5774
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.5349
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.512
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.5056
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4744
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4707
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4701
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4609
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4492
+        ]
+      ],
+      "best_score": 0.6185,
+      "first_hit_rank": null,
+      "gate_abstained": false
+    },
+    {
+      "id": "q27",
+      "question": "How do I add JWT authentication to a FastAPI app?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4192
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4192
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4046
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4008
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.3878
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.3767
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.3605
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.3391
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3373
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.3141
+        ]
+      ],
+      "best_score": 0.4192,
+      "first_hit_rank": null,
+      "gate_abstained": false
+    },
+    {
+      "id": "q28",
+      "question": "How do I connect FastAPI to a PostgreSQL database?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.5018
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4661
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4626
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4616
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.4432
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.4431
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4068
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.4024
+        ],
+        [
+          "fastapi-path-params.pdf",
+          1,
+          0.4018
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.387
+        ]
+      ],
+      "best_score": 0.5018,
+      "first_hit_rank": null,
+      "gate_abstained": false
+    },
+    {
+      "id": "q29",
+      "question": "How do I deploy a FastAPI app with Docker?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4864
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.4487
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.4287
+        ],
+        [
+          "fastapi-path-params.pdf",
+          10,
+          0.4127
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.4092
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.4006
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.3999
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.3972
+        ],
+        [
+          "fastapi-path-params.pdf",
+          3,
+          0.3953
+        ],
+        [
+          "fastapi-path-params.pdf",
+          7,
+          0.3761
+        ]
+      ],
+      "best_score": 0.4864,
+      "first_hit_rank": null,
+      "gate_abstained": false
+    },
+    {
+      "id": "q30",
+      "question": "What is the capital of France?",
+      "should_abstain": true,
+      "expected": [],
+      "retrieved": [
+        [
+          "active.txt",
+          null,
+          0.1101
+        ],
+        [
+          "fastapi-path-params.pdf",
+          4,
+          0.1087
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.0953
+        ],
+        [
+          "fastapi-path-params.pdf",
+          12,
+          0.0887
+        ],
+        [
+          "fastapi-path-params.pdf",
+          2,
+          0.0788
+        ],
+        [
+          "fastapi-path-params.pdf",
+          11,
+          0.0678
+        ],
+        [
+          "fastapi-path-params.pdf",
+          8,
+          0.0658
+        ],
+        [
+          "fastapi-path-params.pdf",
+          5,
+          0.0656
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.0603
+        ],
+        [
+          "fastapi-path-params.pdf",
+          13,
+          0.0593
+        ]
+      ],
+      "best_score": 0.1101,
+      "first_hit_rank": null,
+      "gate_abstained": true
+    }
+  ]
+}

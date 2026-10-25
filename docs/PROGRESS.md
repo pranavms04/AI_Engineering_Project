@@ -14,7 +14,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
 | 8 | Streamlit UI | ✅ done | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
-| 9 | Evaluation | ⬜ | | |
+| 9 | Evaluation | ✅ done | 115 total (+24) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
 | 10 | Docker, CI, README | ⬜ | | |
 | 11 | Interview prep pack | ⬜ | | |
 
@@ -61,6 +61,18 @@ Phase 8 run (2026-10-25), Streamlit UI on 127.0.0.1:8501 → API → Ollama, lla
 - Rebuild from UI: 14 documents, 35 chunks in 2.94 s. Upload of an invented note → saved; second upload → "already exists" (409). Note deleted afterwards.
 - Streamlit install added 20 packages (all Apache-2.0/MIT/BSD); largest: pyarrow 127 MB, pandas 82 MB, streamlit 35 MB.
 
+Phase 9 evaluation (2026-10-25), `evaluation/dataset.jsonl` = 30 questions (24 answerable, 6 should abstain), all from fastapi-path-params.pdf.
+Details and file names: `evaluation/README.md`. Config: chunk 500/100, top_k 4, MIN_SCORE 0.30, MiniLM, llama3.2:3b, prompt v1, temp 0.1.
+- Retrieval (deterministic): recall@1 0.667, recall@3 0.917, recall@4 0.958, recall@10 1.000, MRR@10 0.803; gate abstention P 0.500 / R 0.333.
+- Full RAG, 3 identical runs: keyword coverage 0.694 / 0.736 / 0.694; citation accuracy 0.750 / 0.826 / 0.905;
+  answers with an invalid citation 5 / 4 / 2; final abstention P/R 0.600/1.000 (inflated, see bugs) / 0.625/0.833 / 0.556/0.833;
+  total latency p50/p95 ms 4925/11759, 3420/8686, 2591/10927.
+- Repeatable failures: q01 cites p. 2 (not retrieved) every run; q06 cites p. 4; q02 refused by the LLM; q18/q21 (paraphrases) refused by the gate;
+  q29 (Docker, should abstain) gets an invented answer; q08 says "the last one will override" in all 5 runs (p. 6: "the first one will always be used").
+- Chunk experiment (retrieval): 300/100 → R@4 0.875, MRR 0.794; 500/100 → 0.958, 0.803; 800/150 → 0.917, 0.779. Kept 500/100.
+- MIN_SCORE sweep (gate): no threshold separates classes (q18 answerable and q25 should-abstain both 0.2778; q26–q29 score 0.45–0.59).
+  Tested 0.20 with the LLM (2 runs): q21 fixed, but q18 became wrong and q25 invented. Kept 0.30.
+
 ## Bugs fixed (learning log)
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
@@ -69,6 +81,8 @@ Phase 8 run (2026-10-25), Streamlit UI on 127.0.0.1:8501 → API → Ollama, lla
 - Phase 6: first pull failed with `no space left on device`; later the Ollama app and models were removed, so Ollama was reinstalled with Homebrew. A network drop stalled the pull once; restarting it resumed.
 - Phase 6: llama3.2:3b wrote a wrong page number in a citation; `validate_citations` caught it. Prompt fix not done yet.
 - Phase 6: `ollama pull` was reported done but Ollama was not installed on this Mac; the CLI fails with a clear message instead of a stack trace.
+- Phase 9: evaluation found the app's `_is_abstain` uses a substring match — an invented answer ending with the refusal sentence counts as abstained (q29). Added strict abstention to the eval; app fix is a follow-up.
+- Phase 9: citation regex matches code like `[user.value]` as a citation (q09). Follow-up.
 - Phase 8: disk at 1.7 GB free again (Gradle cache regrew to 8.3 GB); cleared before installing Streamlit. First `pip install` hit a PyPI read timeout; retried with `--timeout 120 --retries 10`.
 - Phase 8: security review found Streamlit listening on all interfaces by default → `server.address = "localhost"`; and LLM Markdown could load attacker image URLs → `remove_images()`.
 - Phase 7: `POST /index/rebuild` returned 500 when DOCS_DIR did not exist (`FileNotFoundError` from `iterdir`); found by a test, fixed with an `is_dir()` check → 400.
