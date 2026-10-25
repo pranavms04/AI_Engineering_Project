@@ -1,0 +1,166 @@
+{
+  "recorded_at": "2026-10-25T22:26:22",
+  "git_commit": "5abc21e",
+  "model": "llama3.2:3b",
+  "min_score": 0.3,
+  "top_k": 4,
+  "chunks_in_index": 35,
+  "answers": [
+    {
+      "answer": "You can declare the type of a path parameter in the function, using standard Python type annotations: [fastapi-path-params.pdf, p. 2].",
+      "sources": [
+        {
+          "citation": "[fastapi-path-params.pdf, p. 6]",
+          "source": "fastapi-path-params.pdf",
+          "page": 6,
+          "score": 0.5548,
+          "snippet": "The first one will always be used since the path matches first.\nPredefined values\nIf you have a path operation that receives a path parameter, but you want the possible valid path\nparameter values to "
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 1]",
+          "source": "fastapi-path-params.pdf",
+          "page": 1,
+          "score": 0.4696,
+          "snippet": "FastAPI Learn Tutorial - User Guide \nPath Parameters\nYou can declare path \"parameters\" or \"variables\" with the same syntax used by Python format\nstrings:\nThe value of the path parameter item_id will b"
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 12]",
+          "source": "fastapi-path-params.pdf",
+          "page": 12,
+          "score": 0.4684,
+          "snippet": "Path parameters containing paths\nLet's say you have a path operation with a path /files/{file_path}.\nBut you need file_path itself to contain a path, like home/johndoe/myfile.txt.\nSo, the URL for that"
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 12]",
+          "source": "fastapi-path-params.pdf",
+          "page": 12,
+          "score": 0.4389,
+          "snippet": "hat are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the internal tools from Starlette.\nAnd the docs would still work, although not adding any documentation"
+        }
+      ],
+      "abstained": false,
+      "invalid_citations": [
+        "[fastapi-path-params.pdf, p. 2]"
+      ],
+      "prompt_version": "v1",
+      "model": "llama3.2:3b",
+      "timings_ms": {
+        "retrieve": 12711.3,
+        "generate": 5959.7,
+        "total": 18943.1
+      },
+      "question": "How do I declare a path parameter with a type?",
+      "citations": [
+        "[fastapi-path-params.pdf, p. 2]"
+      ],
+      "retrieved_texts": [
+        "The first one will always be used since the path matches first.\nPredefined values\nIf you have a path operation that receives a path parameter, but you want the possible valid path\nparameter values to be predefined, you can use a standard Python Enum.\nCreate an Enum class\nImport Enum and create a sub-class that inherits from str and from Enum.\nBy inheriting from str the API docs will be able to know that the values must be of type\nstring and will be able to render correctly.\nThen create class",
+        "FastAPI Learn Tutorial - User Guide \nPath Parameters\nYou can declare path \"parameters\" or \"variables\" with the same syntax used by Python format\nstrings:\nThe value of the path parameter item_id will be passed to your function as the argument\nitem_id.\nSo, if you run this example and go to http://127.0.0.1:8000/items/foo , you will see a\nresponse of:\nPath parameters with types\nYou can declare the type of a path parameter in the function, using standard Python type\nannotations:\nIn this case,",
+        "Path parameters containing paths\nLet's say you have a path operation with a path /files/{file_path}.\nBut you need file_path itself to contain a path, like home/johndoe/myfile.txt.\nSo, the URL for that file would be something like: /files/home/johndoe/myfile.txt.\nOpenAPI support\nOpenAPI doesn't support a way to declare a path parameter to contain a path inside, as that\ncould lead to scenarios that are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the",
+        "hat are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the internal tools from Starlette.\nAnd the docs would still work, although not adding any documentation telling that the\nparameter should contain a path.\nPath convertor\nUsing an option directly from Starlette you can declare a path parameter containing a path\nusing a URL like:\nIn this case, the name of the parameter is file_path, and the last part, :path, tells it that the\nparameter should match any"
+      ]
+    },
+    {
+      "answer": "If you send a string to a path parameter declared as int, FastAPI will raise a `ValueError` with a message indicating that the input should be a valid integer, unable to parse the string as an integer, as shown in [fastapi-path-params.pdf, p. 2].",
+      "sources": [
+        {
+          "citation": "[fastapi-path-params.pdf, p. 6]",
+          "source": "fastapi-path-params.pdf",
+          "page": 6,
+          "score": 0.4866,
+          "snippet": "The first one will always be used since the path matches first.\nPredefined values\nIf you have a path operation that receives a path parameter, but you want the possible valid path\nparameter values to "
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 2]",
+          "source": "fastapi-path-params.pdf",
+          "page": 2,
+          "score": 0.4448,
+          "snippet": "_id\"\n ],\n \"msg\": \"Input should be a valid integer, unable to parse string as an \ninteger\",\n \"input\": \"foo\"\n }\n ]\n}\n22/10/2026, 08:07 Path Parameters - FastAPI\nhttps://fastapi.tiangolo.com/tutorial/pat"
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 1]",
+          "source": "fastapi-path-params.pdf",
+          "page": 1,
+          "score": 0.433,
+          "snippet": "FastAPI Learn Tutorial - User Guide \nPath Parameters\nYou can declare path \"parameters\" or \"variables\" with the same syntax used by Python format\nstrings:\nThe value of the path parameter item_id will b"
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 12]",
+          "source": "fastapi-path-params.pdf",
+          "page": 12,
+          "score": 0.4192,
+          "snippet": "Path parameters containing paths\nLet's say you have a path operation with a path /files/{file_path}.\nBut you need file_path itself to contain a path, like home/johndoe/myfile.txt.\nSo, the URL for that"
+        }
+      ],
+      "abstained": false,
+      "invalid_citations": [],
+      "prompt_version": "v1",
+      "model": "llama3.2:3b",
+      "timings_ms": {
+        "retrieve": 4622.9,
+        "generate": 10961.7,
+        "total": 15601.1
+      },
+      "question": "What happens if I send a string to a path parameter declared as int?",
+      "citations": [
+        "[fastapi-path-params.pdf, p. 2]"
+      ],
+      "retrieved_texts": [
+        "The first one will always be used since the path matches first.\nPredefined values\nIf you have a path operation that receives a path parameter, but you want the possible valid path\nparameter values to be predefined, you can use a standard Python Enum.\nCreate an Enum class\nImport Enum and create a sub-class that inherits from str and from Enum.\nBy inheriting from str the API docs will be able to know that the values must be of type\nstring and will be able to render correctly.\nThen create class",
+        "_id\"\n ],\n \"msg\": \"Input should be a valid integer, unable to parse string as an \ninteger\",\n \"input\": \"foo\"\n }\n ]\n}\n22/10/2026, 08:07 Path Parameters - FastAPI\nhttps://fastapi.tiangolo.com/tutorial/path-params/ 2/13",
+        "FastAPI Learn Tutorial - User Guide \nPath Parameters\nYou can declare path \"parameters\" or \"variables\" with the same syntax used by Python format\nstrings:\nThe value of the path parameter item_id will be passed to your function as the argument\nitem_id.\nSo, if you run this example and go to http://127.0.0.1:8000/items/foo , you will see a\nresponse of:\nPath parameters with types\nYou can declare the type of a path parameter in the function, using standard Python type\nannotations:\nIn this case,",
+        "Path parameters containing paths\nLet's say you have a path operation with a path /files/{file_path}.\nBut you need file_path itself to contain a path, like home/johndoe/myfile.txt.\nSo, the URL for that file would be something like: /files/home/johndoe/myfile.txt.\nOpenAPI support\nOpenAPI doesn't support a way to declare a path parameter to contain a path inside, as that\ncould lead to scenarios that are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the"
+      ]
+    },
+    {
+      "answer": "I couldn't find this in the documents.",
+      "sources": [
+        {
+          "citation": "[fastapi-path-params.pdf, p. 4]",
+          "source": "fastapi-path-params.pdf",
+          "page": 4,
+          "score": 0.1196,
+          "snippet": "API documentation (using ReDoc), which\nyou can access at http://127.0.0.1:8000/redoc :\nThe same way, there are many compatible tools. Including code generation tools for many\nlanguages.\nTip\n22/10/2026"
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 12]",
+          "source": "fastapi-path-params.pdf",
+          "page": 12,
+          "score": 0.112,
+          "snippet": "hat are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the internal tools from Starlette.\nAnd the docs would still work, although not adding any documentation"
+        },
+        {
+          "citation": "[active.txt]",
+          "source": "active.txt",
+          "page": null,
+          "score": 0.1101,
+          "snippet": null
+        },
+        {
+          "citation": "[fastapi-path-params.pdf, p. 11]",
+          "source": "fastapi-path-params.pdf",
+          "page": 11,
+          "score": 0.0678,
+          "snippet": "ages\"}\n return {\"model_name\": model_name, \"message\": \"Have some residuals\"}\n{\n22/10/2026, 08:07 Path Parameters - FastAPI\nhttps://fastapi.tiangolo.com/tutorial/path-params/ 11/13"
+        }
+      ],
+      "abstained": true,
+      "invalid_citations": [],
+      "prompt_version": "v1",
+      "model": "llama3.2:3b",
+      "timings_ms": {
+        "retrieve": 2153.2,
+        "generate": 0.0,
+        "total": 2163.0
+      },
+      "question": "What is the capital of France?",
+      "citations": [],
+      "retrieved_texts": [
+        "API documentation (using ReDoc), which\nyou can access at http://127.0.0.1:8000/redoc :\nThe same way, there are many compatible tools. Including code generation tools for many\nlanguages.\nTip\n22/10/2026, 08:07 Path Parameters - FastAPI\nhttps://fastapi.tiangolo.com/tutorial/path-params/ 4/13",
+        "hat are difficult to test and define.\nNevertheless, you can still do it in FastAPI, using one of the internal tools from Starlette.\nAnd the docs would still work, although not adding any documentation telling that the\nparameter should contain a path.\nPath convertor\nUsing an option directly from Starlette you can declare a path parameter containing a path\nusing a URL like:\nIn this case, the name of the parameter is file_path, and the last part, :path, tells it that the\nparameter should match any",
+        null,
+        "ages\"}\n return {\"model_name\": model_name, \"message\": \"Have some residuals\"}\n{\n22/10/2026, 08:07 Path Parameters - FastAPI\nhttps://fastapi.tiangolo.com/tutorial/path-params/ 11/13"
+      ]
+    }
+  ]
+}

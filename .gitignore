@@ -7,3 +7,7 @@ __pycache__/
 storage/
 data/sample_docs/*
 !data/sample_docs/.gitkeep
+
+# scroll-craft working files (brief, raw captures, test screenshots). The published page lives in site/.
+scrollcraft/
+node_modules/

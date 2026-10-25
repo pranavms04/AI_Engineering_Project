@@ -1,0 +1,237 @@
+{
+  "retrieval_file": "20261025-221343-retrieval-c500o100.json",
+  "config": {
+    "date": "2026-10-25T22:13:43",
+    "chunk_size": 500,
+    "chunk_overlap": 100,
+    "top_k": 4,
+    "min_score": 0.3,
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunks_in_index": 35
+  },
+  "questions_total": 30,
+  "answerable": 24,
+  "should_abstain": 6,
+  "hits_at_4": 23,
+  "mrr_at_10": 0.8034722222222221,
+  "questions": [
+    {
+      "id": "q01",
+      "question": "How do I declare a path parameter with a type?",
+      "should_abstain": false,
+      "best_score": 0.5548
+    },
+    {
+      "id": "q02",
+      "question": "What does FastAPI return if I open /items/foo when item_id is declared as an int?",
+      "should_abstain": false,
+      "best_score": 0.7316
+    },
+    {
+      "id": "q03",
+      "question": "If I open /items/3, what type is the value my function receives?",
+      "should_abstain": false,
+      "best_score": 0.415
+    },
+    {
+      "id": "q04",
+      "question": "Where can I see the automatic interactive API documentation?",
+      "should_abstain": false,
+      "best_score": 0.5674
+    },
+    {
+      "id": "q05",
+      "question": "Which tool provides FastAPI's alternative API documentation, and at what URL?",
+      "should_abstain": false,
+      "best_score": 0.7856
+    },
+    {
+      "id": "q06",
+      "question": "Which library performs the data validation in FastAPI?",
+      "should_abstain": false,
+      "best_score": 0.6934
+    },
+    {
+      "id": "q07",
+      "question": "Why must /users/me be declared before /users/{user_id}?",
+      "should_abstain": false,
+      "best_score": 0.6132
+    },
+    {
+      "id": "q08",
+      "question": "What happens if I define the same path operation twice?",
+      "should_abstain": false,
+      "best_score": 0.4509
+    },
+    {
+      "id": "q09",
+      "question": "How do I restrict a path parameter to a set of predefined values?",
+      "should_abstain": false,
+      "best_score": 0.496
+    },
+    {
+      "id": "q10",
+      "question": "Why should the Enum class also inherit from str?",
+      "should_abstain": false,
+      "best_score": 0.4221
+    },
+    {
+      "id": "q11",
+      "question": "What are AlexNet, ResNet and LeNet in the example?",
+      "should_abstain": false,
+      "best_score": 0.4234
+    },
+    {
+      "id": "q12",
+      "question": "How do I get the actual string value of an enum member like model_name?",
+      "should_abstain": false,
+      "best_score": 0.615
+    },
+    {
+      "id": "q13",
+      "question": "What happens when I return enum members in a JSON response?",
+      "should_abstain": false,
+      "best_score": 0.5089
+    },
+    {
+      "id": "q14",
+      "question": "How can a path parameter contain a whole file path like home/johndoe/myfile.txt?",
+      "should_abstain": false,
+      "best_score": 0.6543
+    },
+    {
+      "id": "q15",
+      "question": "Does OpenAPI support path parameters that contain paths, and how does FastAPI handle it?",
+      "should_abstain": false,
+      "best_score": 0.8152
+    },
+    {
+      "id": "q16",
+      "question": "What URL do I use if the file path starts with a slash?",
+      "should_abstain": false,
+      "best_score": 0.4361
+    },
+    {
+      "id": "q17",
+      "question": "What message does the example return for the alexnet model?",
+      "should_abstain": false,
+      "best_score": 0.5766
+    },
+    {
+      "id": "q18",
+      "question": "Can a URL segment be limited to a fixed list of choices?",
+      "should_abstain": false,
+      "best_score": 0.2778
+    },
+    {
+      "id": "q19",
+      "question": "My endpoint for the logged-in person keeps getting caught by the endpoint with a variable ID. How do I fix it?",
+      "should_abstain": false,
+      "best_score": 0.3497
+    },
+    {
+      "id": "q20",
+      "question": "What does the client receive when a typed URL value can't be converted, like a decimal where a whole number is expected?",
+      "should_abstain": false,
+      "best_score": 0.3717
+    },
+    {
+      "id": "q21",
+      "question": "Which third-party component checks incoming values behind the scenes?",
+      "should_abstain": false,
+      "best_score": 0.2184
+    },
+    {
+      "id": "q22",
+      "question": "What two documentation interfaces does FastAPI generate, and at which URLs?",
+      "should_abstain": false,
+      "best_score": 0.7394
+    },
+    {
+      "id": "q23",
+      "question": "How do I declare an enum path parameter and then compare or read its value?",
+      "should_abstain": false,
+      "best_score": 0.649
+    },
+    {
+      "id": "q24",
+      "question": "What benefits do Python type declarations give you in FastAPI?",
+      "should_abstain": false,
+      "best_score": 0.6016
+    },
+    {
+      "id": "q25",
+      "question": "How do I declare query parameters with default values?",
+      "should_abstain": true,
+      "best_score": 0.2778
+    },
+    {
+      "id": "q26",
+      "question": "How do I upload a file in FastAPI?",
+      "should_abstain": true,
+      "best_score": 0.5921
+    },
+    {
+      "id": "q27",
+      "question": "How do I add JWT authentication to a FastAPI app?",
+      "should_abstain": true,
+      "best_score": 0.4532
+    },
+    {
+      "id": "q28",
+      "question": "How do I connect FastAPI to a PostgreSQL database?",
+      "should_abstain": true,
+      "best_score": 0.5018
+    },
+    {
+      "id": "q29",
+      "question": "How do I deploy a FastAPI app with Docker?",
+      "should_abstain": true,
+      "best_score": 0.482
+    },
+    {
+      "id": "q30",
+      "question": "What is the capital of France?",
+      "should_abstain": true,
+      "best_score": 0.1196
+    }
+  ],
+  "llm_runs": [
+    {
+      "file": "20261025-220558-llm-c500o100.json",
+      "citation_accuracy": 0.75,
+      "answers_with_invalid_citation": 5,
+      "abstention_true_positives": 5,
+      "abstention_missed": [
+        "How do I deploy a FastAPI app with Docker?"
+      ],
+      "generate_p50_ms": 4665.450000000001,
+      "total_p50_ms": 4924.75,
+      "total_p95_ms": 11759.434999999998
+    },
+    {
+      "file": "20261025-220910-llm-c500o100.json",
+      "citation_accuracy": 0.8260869565217391,
+      "answers_with_invalid_citation": 4,
+      "abstention_true_positives": 5,
+      "abstention_missed": [
+        "How do I deploy a FastAPI app with Docker?"
+      ],
+      "generate_p50_ms": 3292.8500000000004,
+      "total_p50_ms": 3420.3,
+      "total_p95_ms": 8686.235
+    },
+    {
+      "file": "20261025-221228-llm-c500o100.json",
+      "citation_accuracy": 0.9047619047619048,
+      "answers_with_invalid_citation": 2,
+      "abstention_true_positives": 5,
+      "abstention_missed": [
+        "How do I deploy a FastAPI app with Docker?"
+      ],
+      "generate_p50_ms": 2442.2,
+      "total_p50_ms": 2591.2,
+      "total_p95_ms": 10927.229999999989
+    }
+  ]
+}

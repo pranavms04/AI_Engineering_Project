@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Knowledge Assistant · answers from your own documents, with citations</title>
+<meta name="description" content="A private assistant that answers questions about your own documents, cites the page every answer came from, and says so when it doesn't know. Runs on your computer.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230e1014'/><path d='M9 8.5h9.5a3 3 0 0 1 3 3V24H12a3 3 0 0 1-3-3z' fill='none' stroke='%23f2b544' stroke-width='2'/><path d='M12.5 13h5.5M12.5 17h4' stroke='%23eceef1' stroke-width='1.6' stroke-linecap='round'/></svg>">
+<link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+  @font-face { font-family: "Geist"; src: url("fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+
+  :root {
+    --sc-canvas:     #0e1014;
+    --sc-surface:    #171a20;
+    --sc-ink:        #eceef1;
+    --sc-ink-soft:   #a3abb6;
+    --sc-accent:     #f2b544;
+    --sc-accent-ink: #1a1408;
+    --sc-font-display: "Geist", system-ui, sans-serif;
+    --sc-font-text:    "Geist", system-ui, sans-serif;
+    --sc-font-mono:    "Geist Mono", ui-monospace, monospace;
+    --sc-shadow-color: 222 30% 3%;
+
+    --side: 17rem;
+    --panel: #13161b;
+    --accent-tint: color-mix(in oklab, var(--sc-accent) 14%, transparent);
+    --ok: var(--sc-ink);
+  }
+
+  /* ---------- base ---------- */
+  body { background: var(--sc-canvas); }
+  .vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mono { font-family: var(--sc-font-mono); font-size: 0.92em; letter-spacing: 0; }
+  .icon { width: 1.05em; height: 1.05em; flex: none; vertical-align: -0.16em; }
+  a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+  .skip { position: absolute; left: var(--sc-4); top: -4rem; z-index: 100; background: var(--sc-accent); color: var(--sc-accent-ink); padding: var(--sc-2) var(--sc-4); border-radius: var(--sc-r-sm); }
+  .skip:focus { top: var(--sc-4); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: var(--sc-2);
+    min-height: 2.75rem; padding: 0 var(--sc-5);
+    border-radius: var(--sc-r-sm); border: 1px solid transparent;
+    font: 600 var(--sc-t-sm)/1 var(--sc-font-text); letter-spacing: -0.005em;
+    text-decoration: none; white-space: nowrap; cursor: pointer;
+    transition: transform var(--sc-d-fast) var(--sc-ease-out), background-color var(--sc-d-fast) var(--sc-ease-out), border-color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .btn:active { transform: translateY(1px) scale(0.98); }
+  .btn--primary { background: var(--sc-accent); color: var(--sc-accent-ink); box-shadow: var(--sc-e1); }
+  .btn--ghost { color: var(--sc-ink); border-color: var(--sc-hairline-strong); background: transparent; }
+  @media (hover: hover) and (pointer: fine) {
+    .btn--primary:hover { background: color-mix(in oklab, var(--sc-accent) 88%, white); }
+    .btn--ghost:hover { border-color: color-mix(in oklab, var(--sc-ink) 40%, transparent); background: color-mix(in oklab, var(--sc-ink) 5%, transparent); }
+  }
+
+  /* ---------- app chrome: the sidebar is the navigation ---------- */
+  .side {
+    position: fixed; inset: 0 auto 0 0; width: var(--side); z-index: var(--sc-z-chrome);
+    display: flex; flex-direction: column; gap: var(--sc-6);
+    padding: var(--sc-6) var(--sc-5) var(--sc-5);
+    background: var(--sc-surface); box-shadow: var(--sc-edge), 1px 0 0 var(--sc-hairline);
+    overflow-y: auto;
+  }
+  .brand { display: flex; align-items: center; gap: var(--sc-3); font-weight: 650; font-size: var(--sc-t-sm); letter-spacing: -0.01em; text-decoration: none; }
+  .brand svg { width: 1.75rem; height: 1.75rem; }
+  .side h2 { font-size: var(--sc-t-xs); font-weight: 600; color: var(--sc-ink-soft); letter-spacing: 0.02em; margin: 0 0 var(--sc-3); }
+  .status { display: grid; gap: var(--sc-2); font-size: var(--sc-t-sm); margin: 0; }
+  .status div { display: flex; justify-content: space-between; gap: var(--sc-3); }
+  .status dt { color: var(--sc-ink-soft); }
+  .status dd { margin: 0; font-family: var(--sc-font-mono); font-size: 0.86em; }
+  .status__live { display: inline-flex; align-items: center; gap: var(--sc-2); }
+  .status__live::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--sc-accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .nav { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .nav a {
+    display: flex; align-items: center; gap: var(--sc-3); min-height: 2.5rem; padding: 0 var(--sc-3);
+    border-radius: var(--sc-r-sm); text-decoration: none; color: var(--sc-ink-soft); font-size: var(--sc-t-sm);
+    transition: background-color var(--sc-d-fast) var(--sc-ease-out), color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .nav a[aria-current="true"] { color: var(--sc-ink); background: color-mix(in oklab, var(--sc-ink) 7%, transparent); }
+  .nav a[aria-current="true"]::before { background: var(--sc-accent); }
+  .nav a::before { content: ""; width: 0.375rem; height: 0.375rem; border-radius: 50%; background: var(--sc-hairline-strong); flex: none; }
+  @media (hover: hover) and (pointer: fine) { .nav a:hover { color: var(--sc-ink); } }
+  .side__foot { margin-top: auto; display: grid; gap: var(--sc-3); }
+  .side__foot .btn { justify-content: center; }
+  .side__note { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0; line-height: 1.5; }
+
+  .topbar { display: none; }
+
+  main { margin-left: var(--side); }
+  .act-wrap { width: 100%; max-width: 70rem; margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 4rem); }
+
+  /* panel titles: the surface's own idiom, not marketing display type */
+  .panel-title { font-size: var(--sc-t-xl); font-weight: 640; letter-spacing: var(--sc-track-snug); line-height: 1.12; margin: 0; text-wrap: balance; }
+  .panel-lede { margin: var(--sc-3) 0 0; color: var(--sc-ink-soft); max-width: 58ch; line-height: 1.62; text-wrap: pretty; }
+
+  /* ---------- 1 · hero: the surface, already in a state ---------- */
+  .hero { min-height: 100svh; display: grid; align-items: center; padding-block: var(--sc-8) var(--sc-7); position: relative; overflow: hidden; }
+  .hero::before { /* one soft key light from top left; not a glow, a lit room */
+    content: ""; position: absolute; inset: -20% 30% 40% -20%; pointer-events: none;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--sc-ink) 5%, transparent), transparent);
+  }
+  .hero__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: clamp(2rem, 4vw, 4rem); align-items: center; }
+  .hero__mark { display: block; width: 2.5rem; height: 2.5rem; margin-bottom: var(--sc-4); color: var(--sc-accent); }
+  .hero__title { font-size: clamp(2.2rem, 1.3rem + 2.1vw, 3.2rem); font-weight: 700; letter-spacing: var(--sc-track-tight); line-height: 1.04; margin: 0; text-wrap: balance; }
+  .hero__caption { margin: var(--sc-4) 0 0; font-size: var(--sc-t-lg); line-height: 1.45; color: var(--sc-ink-soft); max-width: 30ch; text-wrap: pretty; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--sc-3); margin-top: var(--sc-6); }
+
+  .depth { position: relative; height: clamp(26rem, 64vh, 36rem); }
+  .plane { position: absolute; will-change: transform; }
+  .plane--far {
+    width: 64%; right: -4%; top: 0;
+    background: #e9e6df; color: #2a2a2e; border-radius: 4px;
+    padding: var(--sc-5) var(--sc-5) var(--sc-6); box-shadow: var(--sc-e2);
+    font-size: 0.72rem; line-height: 1.55; filter: blur(0.6px); opacity: 0.5;
+    transform-origin: 70% 0;
+  }
+  .plane--far .sheet__head { display: flex; justify-content: space-between; color: #5c5b60; margin-bottom: var(--sc-3); font-family: var(--sc-font-mono); font-size: 0.66rem; }
+  .plane--far p { margin: 0 0 var(--sc-2); }
+  .plane--mid {
+    left: 0; right: 10%; top: 13%;
+    background: var(--panel); border-radius: var(--sc-r-md);
+    box-shadow: var(--sc-edge), var(--sc-e3), 0 0 0 1px var(--sc-hairline);
+    overflow: hidden;
+  }
+  .win__bar { display: flex; align-items: center; justify-content: space-between; padding: var(--sc-3) var(--sc-4); border-bottom: 1px solid var(--sc-hairline); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .win__dots { display: flex; gap: 6px; }
+  .win__dots i { width: 9px; height: 9px; border-radius: 50%; background: color-mix(in oklab, var(--sc-ink) 18%, transparent); }
+  .win__body { padding: var(--sc-5); display: grid; gap: var(--sc-4); }
+  .plane--near {
+    width: min(23rem, 62%); left: 26%; top: 52%;
+    background: var(--sc-surface); border-radius: var(--sc-r-md); padding: var(--sc-4);
+    box-shadow: var(--sc-edge), 0 6px 12px hsl(var(--sc-shadow-color) / 0.35), 0 30px 60px -14px hsl(var(--sc-shadow-color) / 0.55), 0 0 0 1px var(--sc-hairline-strong);
+    font-size: var(--sc-t-xs); line-height: 1.55;
+  }
+  .plane--near .src__tag { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sc-1) var(--sc-3); margin-bottom: var(--sc-2); white-space: nowrap; }
+  .plane--near .src__tag .mono:last-child { color: var(--sc-accent); }
+  .plane--near p { margin: 0; color: var(--sc-ink-soft); }
+
+  /* chat atoms, shared by every scene */
+  .msg { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: var(--sc-3); align-items: start; }
+  .avatar { width: 2rem; height: 2rem; border-radius: var(--sc-r-sm); display: grid; place-items: center; background: color-mix(in oklab, var(--sc-ink) 9%, transparent); }
+  .avatar svg { width: 1.1rem; height: 1.1rem; }
+  .msg--ai .avatar { background: var(--accent-tint); color: var(--sc-accent); }
+  .msg p { margin: 0.3rem 0 0; line-height: 1.55; }
+  .msg--user p { font-weight: 520; }
+  .pending { display: inline-flex; align-items: center; gap: var(--sc-2); color: var(--sc-ink-soft); }
+  .pending__dots { display: inline-flex; gap: 4px; }
+  .pending__dots i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: blink 1.2s var(--sc-ease-in-out) infinite; }
+  .pending__dots i:nth-child(2) { animation-delay: 0.15s; } .pending__dots i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes blink { 0%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+  /* ---------- 2 · check (the peak): pinned surface, state from --sc-p ---------- */
+  .check-stage { display: flex; flex-direction: column; justify-content: center; padding-block: var(--sc-6); }
+  .check-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--sc-2) var(--sc-5); margin-bottom: var(--sc-5); }
+  .recorded { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0; }
+  .check-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--sc-5); align-items: start; }
+  .pane { background: var(--panel); border-radius: var(--sc-r-md); box-shadow: var(--sc-edge), var(--sc-e2), 0 0 0 1px var(--sc-hairline); padding: var(--sc-5); }
+  .convo { display: grid; gap: var(--sc-4); }
+  .answer { min-height: 4.8em; }
+  .answer__typed { white-space: pre-wrap; }
+  .cite { font-family: var(--sc-font-mono); font-size: 0.86em; padding: 0.05em 0.3em; border-radius: 4px; background: color-mix(in oklab, var(--sc-ink) 8%, transparent); transition: background-color var(--sc-d-base) var(--sc-ease-out), color var(--sc-d-base) var(--sc-ease-out); }
+  .cite.is-bad { background: var(--sc-accent); color: var(--sc-accent-ink); }
+  .caret { display: inline-block; width: 0.5em; height: 1.05em; vertical-align: -0.18em; margin-left: 1px; background: var(--sc-accent); opacity: 0; }
+  .is-writing .caret { opacity: 1; }
+  .sources { list-style: none; margin: var(--sc-2) 0 0; padding: 0; display: grid; gap: var(--sc-2); }
+  .sources li {
+    display: flex; justify-content: space-between; gap: var(--sc-3); align-items: center;
+    padding: var(--sc-2) var(--sc-3); border-radius: var(--sc-r-sm); border: 1px solid var(--sc-hairline);
+    font-size: var(--sc-t-xs); opacity: 0; transform: translateY(6px);
+    transition: opacity var(--sc-d-base) var(--sc-ease-out), transform var(--sc-d-base) var(--sc-ease-out), border-color var(--sc-d-base) var(--sc-ease-out);
+  }
+  .sources li.is-on { opacity: 1; transform: none; }
+  .sources li.is-origin { border-color: var(--sc-accent); }
+  .sources .score { font-family: var(--sc-font-mono); color: var(--sc-ink-soft); }
+  .status-line { display: flex; align-items: center; gap: var(--sc-2); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0; min-height: 1.4em; }
+  .inspector { display: grid; gap: var(--sc-4); opacity: 0.5; transition: opacity var(--sc-d-slow) var(--sc-ease-out); }
+  .inspector.is-on { opacity: 1; }
+  .inspector h3 { font-size: var(--sc-t-xs); font-weight: 600; letter-spacing: 0.02em; color: var(--sc-ink-soft); margin: 0 0 var(--sc-2); }
+  .audit { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-2); font-size: var(--sc-t-sm); min-height: 2.6em; }
+  .audit li { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr); gap: var(--sc-2); align-items: start; line-height: 1.45; }
+  .audit .icon { color: var(--sc-accent); margin-top: 0.12em; }
+  .audit .ok .icon { color: var(--sc-ink); }
+  .trace { margin: 0; padding: var(--sc-4); border-radius: var(--sc-r-sm); background: color-mix(in oklab, var(--sc-ink) 4%, transparent); font-size: var(--sc-t-xs); line-height: 1.6; color: var(--sc-ink-soft); max-height: 11.5em; overflow: hidden; position: relative; }
+  .trace mark { background: var(--accent-tint); color: var(--sc-ink); box-shadow: inset 0 -2px 0 var(--sc-accent); border-radius: 2px; transition: background-color var(--sc-d-slow) var(--sc-ease-out); }
+  .trace:not(.is-found) mark { background: transparent; box-shadow: none; color: inherit; }
+  .trace__src { display: block; margin-bottom: var(--sc-2); font-family: var(--sc-font-mono); color: var(--sc-ink); }
+  .verdict { margin: 0; font-size: var(--sc-t-sm); line-height: 1.5; min-height: 3em; }
+
+  /* ---------- 3 · refuse: a wipe is the change of state ---------- */
+  .refuse { padding-block: var(--sc-8) var(--sc-7); }
+  .refuse__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  .refuse__copy { order: 2; }
+  .reply-info { margin-top: 0.3rem; padding: var(--sc-3) var(--sc-4); border-radius: var(--sc-r-sm); background: color-mix(in oklab, var(--sc-ink) 7%, transparent); }
+  .gate { margin-top: var(--sc-4); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .gate__track { position: relative; height: 2.25rem; margin: var(--sc-2) 0 var(--sc-1); border-bottom: 1px solid var(--sc-hairline-strong); }
+  .gate__dot { position: absolute; bottom: -5px; width: 9px; height: 9px; margin-left: -4.5px; border-radius: 50%; border: 1.5px solid var(--sc-ink); background: var(--panel); }
+  .gate__line { position: absolute; top: 0; bottom: -8px; width: 2px; margin-left: -1px; background: var(--sc-accent); }
+  .gate__line span { position: absolute; top: -0.3rem; left: 6px; white-space: nowrap; color: var(--sc-ink); font-family: var(--sc-font-mono); }
+  .gate__scale { display: flex; justify-content: space-between; font-family: var(--sc-font-mono); }
+
+  /* ---------- 4 · threshold: a real control on real data ---------- */
+  .tune { padding-block: var(--sc-7); }
+  .tune__pane { margin-top: var(--sc-6); }
+  .tune__control { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sc-4); align-items: center; }
+  .tune__control label { font-size: var(--sc-t-sm); font-weight: 560; }
+  .tune__value { font-family: var(--sc-font-mono); font-size: var(--sc-t-lg); min-width: 3.4em; text-align: right; font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; height: 2.75rem; background: transparent; cursor: pointer; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: var(--sc-hairline-strong); }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 1.25rem; height: 1.25rem; margin-top: -0.5rem; border-radius: 50%; background: var(--sc-accent); border: 3px solid var(--panel); box-shadow: var(--sc-e1); }
+  input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--sc-hairline-strong); }
+  input[type="range"]::-moz-range-thumb { width: 1rem; height: 1rem; border-radius: 50%; background: var(--sc-accent); border: 3px solid var(--panel); }
+  input[type="range"] { -webkit-appearance: none; appearance: none; }
+  .strip { position: relative; height: 7.5rem; margin: var(--sc-5) 0 var(--sc-2); }
+  .strip__axis { position: absolute; left: 0; right: 0; bottom: 1.25rem; border-bottom: 1px solid var(--sc-hairline-strong); }
+  .strip__tick { position: absolute; bottom: 0; transform: translateX(-50%); font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .strip__dot { position: absolute; width: 12px; height: 12px; margin: 0 0 -6px -6px; border-radius: 50%; transition: opacity var(--sc-d-fast) var(--sc-ease-out), transform var(--sc-d-fast) var(--sc-ease-out); }
+  .strip__dot.is-answerable { border: 1.5px solid var(--sc-ink); background: var(--panel); }
+  .strip__dot.is-abstain { background: var(--sc-accent); border: 1.5px solid var(--sc-accent); }
+  .strip__dot.is-refused { opacity: 0.38; transform: scale(0.82); }
+  .strip__line { position: absolute; top: 0; bottom: 1.25rem; width: 2px; margin-left: -1px; background: var(--sc-accent); transition: left 60ms linear; }
+  .strip__shade { position: absolute; left: 0; top: 0; bottom: 1.25rem; background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in oklab, var(--sc-ink) 5%, transparent) 6px 7px); }
+  .legend { display: flex; flex-wrap: wrap; gap: var(--sc-2) var(--sc-5); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0; padding: 0; list-style: none; }
+  .legend li { display: inline-flex; align-items: center; gap: var(--sc-2); }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sc-4); margin: var(--sc-5) 0 0; padding-top: var(--sc-4); border-top: 1px solid var(--sc-hairline); }
+  .readout dt { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .readout dd { margin: var(--sc-1) 0 0; font-size: var(--sc-t-xl); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: var(--sc-track-snug); }
+  .readout dd small { font-size: var(--sc-t-sm); font-weight: 450; color: var(--sc-ink-soft); }
+  .tune__finding { margin: var(--sc-5) 0 0; max-width: 64ch; line-height: 1.62; text-wrap: pretty; }
+
+  /* ---------- 5 · numbers: a telemetry ledger, not stat cards ---------- */
+  .nums { padding-block: var(--sc-7); }
+  .ledger { margin: var(--sc-6) 0 0; border-top: 1px solid var(--sc-hairline-strong); }
+  .ledger > div { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--sc-4) var(--sc-6); padding: var(--sc-5) 0; border-bottom: 1px solid var(--sc-hairline); align-items: baseline; }
+  .ledger dt { line-height: 1.5; }
+  .ledger dt small { display: block; margin-top: var(--sc-1); color: var(--sc-ink-soft); font-size: var(--sc-t-xs); }
+  .ledger dd { margin: 0; font-size: var(--sc-t-2xl); font-weight: 650; letter-spacing: var(--sc-track-tight); line-height: 1; font-variant-numeric: tabular-nums; }
+  .ledger dd .of { font-size: var(--sc-t-lg); color: var(--sc-ink-soft); font-weight: 450; letter-spacing: 0; }
+  .runs { display: flex; gap: var(--sc-2) var(--sc-5); flex-wrap: wrap; font-size: var(--sc-t-xl) !important; }
+  .runs span { display: inline-flex; flex-direction: column; gap: var(--sc-1); }
+  .runs small { font-size: var(--sc-t-xs); font-weight: 450; color: var(--sc-ink-soft); letter-spacing: 0; }
+  .sources-note { margin: var(--sc-4) 0 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); line-height: 1.6; max-width: 80ch; }
+  .sources-note code { font-family: var(--sc-font-mono); }
+
+  /* ---------- 6 · run it: the close is a first-run step ---------- */
+  .run { padding-block: var(--sc-7) var(--sc-6); }
+  .run__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 4vw, 4rem); align-items: start; margin-top: var(--sc-6); }
+  .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: var(--sc-4); }
+  .steps li { counter-increment: s; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sc-2); min-width: 0; }
+  .steps .step__label { font-size: var(--sc-t-sm); }
+  .steps .step__label::before { content: counter(s) "."; display: inline-block; width: 1.5em; color: var(--sc-ink-soft); font-variant-numeric: tabular-nums; }
+  .cmd { display: flex; align-items: stretch; min-width: 0; border-radius: var(--sc-r-sm); background: var(--panel); box-shadow: var(--sc-edge), 0 0 0 1px var(--sc-hairline); }
+  .cmd pre { margin: 0; padding: var(--sc-3) var(--sc-4); flex: 1; min-width: 0; overflow-x: auto; font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); line-height: 1.65; }
+  .cmd button {
+    flex: none; display: inline-flex; align-items: center; gap: var(--sc-1); padding: 0 var(--sc-3); min-width: 2.75rem; min-height: 2.75rem;
+    background: transparent; color: var(--sc-ink-soft); border: 0; border-left: 1px solid var(--sc-hairline); cursor: pointer;
+    font: 500 var(--sc-t-xs) var(--sc-font-text); transition: color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .cmd button[data-done] { color: var(--sc-accent); }
+  @media (hover: hover) and (pointer: fine) { .cmd button:hover { color: var(--sc-ink); } }
+  .proof { margin: 0; display: grid; gap: var(--sc-4); }
+  .proof video, .proof img { display: block; width: 100%; height: auto; border-radius: var(--sc-r-md); box-shadow: var(--sc-e3), 0 0 0 1px var(--sc-hairline); background: var(--panel); }
+  .proof figcaption { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); line-height: 1.55; }
+  .close-line { margin: var(--sc-8) 0 0; font-size: var(--sc-t-xl); font-weight: 600; letter-spacing: var(--sc-track-snug); line-height: 1.25; max-width: 30ch; text-wrap: balance; }
+  .close-actions { display: flex; flex-wrap: wrap; gap: var(--sc-3); margin-top: var(--sc-5); }
+  .foot { margin-top: var(--sc-8); padding-top: var(--sc-4); border-top: 1px solid var(--sc-hairline); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sc-2) var(--sc-5); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .copied { position: fixed; left: 50%; bottom: var(--sc-5); transform: translate(-50%, 1rem); opacity: 0; background: var(--sc-ink); color: var(--sc-canvas); padding: var(--sc-2) var(--sc-4); border-radius: var(--sc-r-sm); font-size: var(--sc-t-sm); pointer-events: none; transition: opacity var(--sc-d-base) var(--sc-ease-out), transform var(--sc-d-base) var(--sc-ease-out); z-index: 90; }
+  .copied.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- narrower screens ---------- */
+  @media (max-width: 1180px) {
+    .hero__grid { grid-template-columns: 1fr; }
+    .depth { height: clamp(24rem, 56vh, 32rem); max-width: 44rem; }
+  }
+  @media (max-width: 960px) {
+    :root { --side: 0px; }
+    .side { transform: translateX(-100%); visibility: hidden; width: min(20rem, 86vw); transition: transform var(--sc-d-slow) var(--sc-ease-drawer), visibility 0s linear var(--sc-d-slow); }
+    .side.is-open { transform: none; visibility: visible; transition: transform var(--sc-d-slow) var(--sc-ease-drawer); box-shadow: var(--sc-e3); }
+    .topbar {
+      display: flex; position: fixed; inset: 0 0 auto 0; height: 3.5rem; z-index: calc(var(--sc-z-chrome) - 1);
+      align-items: center; justify-content: space-between; padding: 0 var(--sc-4);
+      background: color-mix(in oklab, var(--sc-surface) 94%, transparent); box-shadow: 0 1px 0 var(--sc-hairline);
+    }
+    .topbar__menu { display: inline-flex; align-items: center; gap: var(--sc-2); min-height: 2.75rem; padding: 0 var(--sc-3); background: transparent; color: var(--sc-ink); border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-sm); font: 500 var(--sc-t-sm) var(--sc-font-text); cursor: pointer; }
+    .scrim-nav { position: fixed; inset: 0; z-index: calc(var(--sc-z-chrome) - 1); background: hsl(var(--sc-shadow-color) / 0.55); opacity: 0; pointer-events: none; transition: opacity var(--sc-d-base) var(--sc-ease-out); }
+    .scrim-nav.is-on { opacity: 1; pointer-events: auto; }
+    main { margin-left: 0; }
+    .hero { padding-top: 6rem; min-height: auto; }
+    .check-grid { grid-template-columns: 1fr; gap: var(--sc-4); }
+    .refuse__grid, .run__grid { grid-template-columns: 1fr; }
+    .refuse__copy { order: 0; }
+  }
+  @media (max-width: 700px) {
+    .hero__title { font-size: var(--sc-t-xl); }
+    .hero__caption { font-size: var(--sc-t-base); }
+    .depth { height: 25rem; }
+    .plane--far { width: 78%; right: -10%; }
+    .plane--mid { right: 0; top: 10%; }
+    .plane--near { width: 78%; left: 14%; }
+    .check-stage { padding-block: 4.25rem var(--sc-3); justify-content: flex-start; }
+    .check-head { margin-bottom: var(--sc-3); }
+    .check-head .panel-title { font-size: var(--sc-t-lg); }
+    .pane { padding: var(--sc-4); }
+    .convo .sources { display: none; }
+    .answer { min-height: 6.2em; font-size: var(--sc-t-sm); }
+    .msg--user p { font-size: var(--sc-t-sm); }
+    .trace { max-height: 7.2em; }
+    .verdict { font-size: var(--sc-t-xs); min-height: 2.6em; }
+    .readout { grid-template-columns: 1fr; gap: var(--sc-3); }
+    .readout > div { display: flex; justify-content: space-between; align-items: baseline; }
+    .ledger > div { grid-template-columns: 1fr; gap: var(--sc-2); }
+    .ledger dd { font-size: var(--sc-t-xl); }
+    .tune__control { grid-template-columns: 1fr auto; }
+    .tune__control input { grid-column: 1 / -1; grid-row: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pending__dots i { animation: none; opacity: 0.7; }
+    .plane { will-change: auto; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4.5h10.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.5 9h6M8.5 12.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.5 19.5c1.2-3.2 3.6-4.8 6.5-4.8s5.3 1.6 6.5 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</svg>
+
+<!-- App chrome. On a live surface the chrome IS the navigation. -->
+<div class="topbar">
+  <a class="brand" href="#top"><svg aria-hidden="true" style="color:var(--sc-accent)"><use href="#i-book"/></svg>AI Knowledge Assistant</a>
+  <button class="topbar__menu" type="button" aria-expanded="false" aria-controls="side"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg>Menu</button>
+</div>
+<div class="scrim-nav" aria-hidden="true"></div>
+
+<aside class="side" id="side" aria-label="App sidebar">
+  <a class="brand" href="#top"><svg aria-hidden="true" style="color:var(--sc-accent)"><use href="#i-book"/></svg>AI Knowledge Assistant</a>
+  <section aria-labelledby="st">
+    <h2 id="st">Status</h2>
+    <dl class="status">
+      <div><dt>Runs on</dt><dd><span class="status__live">this computer</span></dd></div>
+      <div><dt>Model</dt><dd data-fill="model">llama3.2:3b</dd></div>
+      <div><dt>Chunks in index</dt><dd data-fill="chunks">35</dd></div>
+      <div><dt>Cost</dt><dd>₹0, no API keys</dd></div>
+    </dl>
+  </section>
+  <nav aria-labelledby="pg">
+    <h2 id="pg">On this page</h2>
+    <ul class="nav">
+      <li><a href="#top">Ask</a></li>
+      <li><a href="#check">Check every citation</a></li>
+      <li><a href="#refuse">Refuse when unsure</a></li>
+      <li><a href="#tune">Set the threshold</a></li>
+      <li><a href="#numbers">Measured numbers</a></li>
+      <li><a href="#run">Run it locally</a></li>
+    </ul>
+  </nav>
+  <div class="side__foot">
+    <a class="btn btn--primary" href="#run">Run it locally</a>
+    <p class="side__note">Everything below comes from recorded runs of the real app. The checks run in this page.</p>
+  </div>
+</aside>
+
+<main id="main">
+
+  <!-- 1 · CURIOSITY: the surface, already in a state -->
+  <section id="top" class="hero" data-sc-act="flow" aria-labelledby="title">
+    <div class="act-wrap hero__grid">
+      <div class="hero__copy">
+        <svg class="hero__mark" aria-hidden="true"><use href="#i-book"/></svg>
+        <h1 id="title" class="hero__title">AI Knowledge Assistant</h1>
+        <p class="hero__caption">Answers only from your documents, with citations. Everything runs on this computer.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#run">Run it locally</a>
+          <a class="btn btn--ghost" href="#check">See it answer</a>
+        </div>
+      </div>
+
+      <div class="depth" aria-hidden="true">
+        <div class="plane plane--far" data-depth="0.25">
+          <div class="sheet__head"><span>fastapi-path-params.pdf</span><span>page 1</span></div>
+          <div data-fill="sheet"></div>
+        </div>
+        <div class="plane plane--mid" data-depth="0.55">
+          <div class="win__bar"><span class="win__dots"><i></i><i></i><i></i></span><span>localhost:8501</span><span></span></div>
+          <div class="win__body">
+            <div class="msg msg--user"><span class="avatar"><svg><use href="#i-user"/></svg></span><p data-fill="q0">How do I declare a path parameter with a type?</p></div>
+            <div class="msg msg--ai"><span class="avatar"><svg><use href="#i-book"/></svg></span><p class="pending"><span class="pending__dots"><i></i><i></i><i></i></span>Searching your documents and asking the local LLM</p></div>
+          </div>
+        </div>
+        <div class="plane plane--near" data-depth="1">
+          <div class="src__tag"><span class="mono" data-fill="nearTag">[fastapi-path-params.pdf, p. 1]</span><span class="mono" data-fill="nearScore">0.470</span></div>
+          <p data-fill="nearText"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · VIGILANCE, the peak: the surface holds while its state advances -->
+  <section id="check" data-sc-act="pin" data-sc-span="3.6" aria-labelledby="check-title">
+    <div data-sc-stage class="check-stage" data-sc-verify-state="">
+      <div class="act-wrap">
+        <div class="check-head">
+          <h2 id="check-title" class="panel-title">Every citation is checked.</h2>
+          <p class="recorded" data-fill="recorded">Recorded run of the real app. The check runs in your browser.</p>
+        </div>
+        <div class="check-grid">
+          <div class="pane convo">
+            <div class="msg msg--user"><span class="avatar"><svg aria-hidden="true"><use href="#i-user"/></svg></span><p data-fill="q0">How do I declare a path parameter with a type?</p></div>
+            <div class="msg msg--ai">
+              <span class="avatar"><svg aria-hidden="true"><use href="#i-book"/></svg></span>
+              <div>
+                <p class="answer" aria-hidden="true"><span class="answer__typed"></span><span class="caret"></span></p>
+                <p class="vh" data-fill="a0full"></p>
+                <ol class="sources" aria-label="Retrieved sources"></ol>
+              </div>
+            </div>
+            <p class="status-line" aria-hidden="true"></p>
+          </div>
+          <div class="pane inspector">
+            <div>
+              <h3>Citation check</h3>
+              <ul class="audit" aria-live="off"></ul>
+            </div>
+            <div>
+              <h3>Where the sentence came from</h3>
+              <blockquote class="trace"><span class="trace__src"></span><span class="trace__text"></span></blockquote>
+            </div>
+            <p class="verdict"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · CALM: a refusal is a change of state, so it arrives as a wipe -->
+  <section id="refuse" class="refuse" data-sc-act="flow" aria-labelledby="refuse-title">
+    <div class="act-wrap refuse__grid">
+      <div class="refuse__copy sc-stack" data-sc-in data-sc-stagger="60">
+        <h2 id="refuse-title" class="panel-title">When it doesn't know, it says so.</h2>
+        <p class="panel-lede">Before the model is asked anything, every question is compared with your documents. If nothing is close enough, the answer is a plain refusal, and the model is never called.</p>
+      </div>
+      <figure class="pane" data-sc-reveal="up" data-sc-reveal-at="0.05 0.4" style="margin:0">
+        <div class="convo" style="display:grid;gap:var(--sc-4)">
+          <div class="msg msg--user"><span class="avatar"><svg aria-hidden="true"><use href="#i-user"/></svg></span><p data-fill="q2">What is the capital of France?</p></div>
+          <div class="msg msg--ai">
+            <span class="avatar"><svg aria-hidden="true"><use href="#i-book"/></svg></span>
+            <div>
+              <p class="reply-info" data-fill="a2">I couldn't find this in the documents.</p>
+              <div class="gate" role="img" data-fill="gateLabel">
+                <span>Closest matches in your documents</span>
+                <div class="gate__track"></div>
+                <div class="gate__scale"><span>0.0</span><span>0.5</span><span>1.0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <figcaption class="recorded" style="margin-top:var(--sc-4)" data-fill="refuseCap"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4 · CONTROL: one handle, thirty real questions -->
+  <section id="tune" class="tune" data-sc-act="flow" aria-labelledby="tune-title">
+    <div class="act-wrap">
+      <div class="sc-stack" data-sc-in data-sc-stagger="60">
+        <h2 id="tune-title" class="panel-title">Move the line yourself.</h2>
+        <p class="panel-lede" data-fill="tuneLede">Each dot is one of 30 test questions. Left of the line, the app refuses before asking the model.</p>
+      </div>
+      <div class="pane tune__pane">
+        <div class="tune__control">
+          <label for="thr">Refusal threshold</label>
+          <input id="thr" type="range" min="0.05" max="0.85" step="0.01" value="0.30" aria-describedby="thr-out">
+          <output id="thr-val" class="tune__value" for="thr">0.30</output>
+        </div>
+        <div class="strip" aria-hidden="true">
+          <div class="strip__shade"></div>
+          <div class="strip__axis"></div>
+          <div class="strip__line"></div>
+        </div>
+        <ul class="legend">
+          <li><i style="background:var(--sc-accent)"></i>Should be refused (not in the PDF)</li>
+          <li><i style="border:1.5px solid var(--sc-ink)"></i>Answerable from the PDF</li>
+          <li>Faded: refused at this threshold</li>
+        </ul>
+        <dl class="readout" id="thr-out" aria-live="polite">
+          <div><dt>Refused correctly</dt><dd data-out="tp">0</dd></div>
+          <div><dt>Refused by mistake</dt><dd data-out="fp">0</dd></div>
+          <div><dt>Let through, should refuse</dt><dd data-out="fn">0</dd></div>
+        </dl>
+        <p class="tune__finding" data-fill="finding"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · CONFIDENCE: real telemetry, including the unflattering parts -->
+  <section id="numbers" class="nums" data-sc-act="flow" aria-labelledby="nums-title">
+    <div class="act-wrap">
+      <div class="sc-stack" data-sc-in data-sc-stagger="60">
+        <h2 id="nums-title" class="panel-title">Measured, not claimed.</h2>
+        <p class="panel-lede" data-fill="numsLede">30 questions written from one 13-page FastAPI PDF, run against the real pipeline.</p>
+      </div>
+      <dl class="ledger">
+        <div>
+          <dt>Answerable questions where a correct page was among the 4 sources the model saw<small>Retrieval only. The same on every run.</small></dt>
+          <dd><span data-count-fill="hits">0</span> <span class="of" data-fill="ofAnswerable">of 24</span></dd>
+        </div>
+        <div>
+          <dt>Citations that pointed at a retrieved source<small>Three full runs of the same 30 questions. The model's wording changes a little between runs.</small></dt>
+          <dd class="runs" data-fill="citeRuns"></dd>
+        </div>
+        <div>
+          <dt>Should-refuse questions the app refused<small data-fill="refuseNote">Score gate plus the model's own refusal, three runs.</small></dt>
+          <dd class="runs" data-fill="refuseRuns"></dd>
+        </div>
+        <div>
+          <dt>Typical time to a full answer<small>Median over 30 questions, three runs, on an 8 GB M1 laptop.</small></dt>
+          <dd class="runs" data-fill="timeRuns"></dd>
+        </div>
+      </dl>
+      <p class="sources-note" data-fill="sourcesNote"></p>
+    </div>
+  </section>
+
+  <!-- 6 · READINESS: the close is a first-run step, not a button island -->
+  <section id="run" class="run" data-sc-act="flow" aria-labelledby="run-title">
+    <div class="act-wrap">
+      <div class="sc-stack" data-sc-in data-sc-stagger="60">
+        <h2 id="run-title" class="panel-title">Run it locally.</h2>
+        <p class="panel-lede">You need Python 3.11 and <a href="https://ollama.com">Ollama</a>. Nothing is uploaded anywhere, and no API key is needed.</p>
+      </div>
+      <div class="run__grid">
+        <ol class="steps">
+          <li><span class="step__label">Get the code</span>
+            <div class="cmd"><pre><code>git clone https://github.com/pranavms04/AI_Engineering_Project.git
+cd AI_Engineering_Project</code></pre><button type="button" data-copy aria-label="Copy: get the code"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button></div></li>
+          <li><span class="step__label">Install</span>
+            <div class="cmd"><pre><code>python3.11 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r requirements.txt</code></pre><button type="button" data-copy aria-label="Copy: install"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button></div></li>
+          <li><span class="step__label">Get the local model</span>
+            <div class="cmd"><pre><code>ollama pull llama3.2:3b</code></pre><button type="button" data-copy aria-label="Copy: get the local model"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button></div></li>
+          <li><span class="step__label">Add your .pdf, .md or .txt files to <span class="mono">data/sample_docs/</span>, then index them</span>
+            <div class="cmd"><pre><code>python -m scripts.build_index</code></pre><button type="button" data-copy aria-label="Copy: index your files"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button></div></li>
+          <li><span class="step__label">Start it (three terminals), then open localhost:8501</span>
+            <div class="cmd"><pre><code>ollama serve
+uvicorn app.api.main:app
+streamlit run ui/streamlit_app.py</code></pre><button type="button" data-copy aria-label="Copy: start it"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button></div></li>
+        </ol>
+        <div class="proof">
+          <figure class="proof" style="margin:0">
+            <video src="assets/app-recording.mp4" poster="assets/app-recording-poster.jpg" controls muted playsinline preload="none" width="1280" height="800" aria-label="Screen recording of the real app answering a question"></video>
+            <figcaption>The real app, recorded on 2026-10-25: a question typed, the documents searched, the answer with four sources. Shown at real speed, 23 seconds.</figcaption>
+          </figure>
+          <figure class="proof" style="margin:0">
+            <img src="assets/app-answer.jpg" width="1600" height="1000" loading="lazy" alt="The Streamlit app: sidebar with status and documents, a question about path parameters, the answer, and four retrieved sources with their scores.">
+            <figcaption>The same answer as a still. Look closely: it says FastAPI "will raise a ValueError". Page 2 actually says it returns an HTTP error. A valid citation proves where a sentence points, not that it is true, so answers still need a person to read the page.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <p class="close-line">It shows you where every answer came from, and it tells you when it doesn't know.</p>
+      <div class="close-actions">
+        <a class="btn btn--primary" href="https://github.com/pranavms04/AI_Engineering_Project">View the source on GitHub</a>
+      </div>
+      <footer class="foot">
+        <span>AI Knowledge Assistant · built by Pranav as a learning and portfolio project</span>
+        <span>Python · FastAPI · Streamlit · FAISS · MiniLM · Ollama</span>
+      </footer>
+    </div>
+  </section>
+
+</main>
+<div class="copied" role="status" aria-live="polite"></div>
+
+<noscript><style>.answer,.sources,.audit,.trace,.strip{display:none}</style></noscript>
+<script src="data/page-data.js"></script>
+<script src="scrollcraft.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
