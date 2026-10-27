@@ -21,6 +21,7 @@ class SourceOut(BaseModel):
     page: int | None
     score: float
     snippet: str
+    chunk_index: int | None = None
 
 
 class AskResponse(BaseModel):
@@ -31,6 +32,25 @@ class AskResponse(BaseModel):
     prompt_version: str
     model: str
     timings_ms: dict[str, float]
+    # Where the question lands on the knowledge map (x, y, z). None if no index is loaded.
+    question_point: list[float] | None = None
+
+
+class MapPoint(BaseModel):
+    id: int
+    source: str
+    page: int | None
+    chunk_index: int | None
+    x: float
+    y: float
+    z: float
+    preview: str
+
+
+class MapOut(BaseModel):
+    points: list[MapPoint]
+    # Share of the variation in the 384-d embeddings that each of the 3 map axes keeps.
+    explained_variance: list[float]
 
 
 class DocumentOut(BaseModel):

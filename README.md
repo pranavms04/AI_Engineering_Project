@@ -22,6 +22,9 @@ it says so. Runs entirely on your own computer: no API keys, no cloud, ₹0.**
   question, it answers "I couldn't find this in the documents." without calling the model.
 - **Private by construction.** Embeddings, search and the LLM all run locally
   (MiniLM, FAISS, Ollama). The API and UI listen on `127.0.0.1` only.
+- **Shows its work in 3D.** The web app draws every passage as a point on a live
+  three.js "knowledge map" (similar meanings sit close together). Your question flies
+  in and lights up the passages it retrieved; click any citation to fly to its passage.
 - **Measured, not claimed.** A 30-question evaluation with recorded config and results
   files; every number below comes from `evaluation/results/`.
 
@@ -75,9 +78,11 @@ Put your `.pdf`, `.md` or `.txt` files in `data/sample_docs/` (git-ignored), the
 ```bash
 python -m scripts.build_index              # build the search index
 ollama serve                               # terminal 1
-uvicorn app.api.main:app                   # terminal 2: API on 127.0.0.1:8000 (/docs for the API page)
-streamlit run ui/streamlit_app.py          # terminal 3: UI on http://localhost:8501
+uvicorn app.api.main:app                   # terminal 2: API + 3D web app on http://localhost:8000
 ```
+
+Open **http://localhost:8000** for the 3D web app (`/docs` is the API page). The simpler
+Streamlit UI still works as a fallback: `streamlit run ui/streamlit_app.py` → http://localhost:8501.
 
 Or from the terminal only: `python -m scripts.ask "your question"`.
 
@@ -92,7 +97,7 @@ ollama serve                               # on the host, first
 docker compose up --build                  # Homebrew/Colima: docker-compose up --build
 ```
 
-Then open http://localhost:8501. Details and troubleshooting: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
+Then open **http://localhost:8000** (3D web app) or http://localhost:8501 (Streamlit fallback). Details and troubleshooting: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
 
 ## Example (real output)
 
@@ -210,10 +215,11 @@ answers; a Flutter client over the same API.
 
 ```text
 app/            ingestion, retrieval, generation, services, api
-ui/             Streamlit UI (HTTP client of the API)
+web/            3D web app: HTML/CSS/JS, three.js vendored (served by the API at /)
+ui/             Streamlit UI, the simpler fallback (HTTP client of the API)
 scripts/        build_index, search, ask
 evaluation/     dataset, metrics, run_eval, rescore, results/
-tests/          pytest suite (123 tests)
+tests/          pytest suite (152 tests)
 site/           static project page (real recorded data)
 docs/           spec, progress log, runbook, learning notes per phase
 ```
@@ -223,3 +229,4 @@ docs/           spec, progress log, runbook, learning notes per phase
 Code: [MIT](LICENSE). Models are downloaded separately and keep their own licences:
 all-MiniLM-L6-v2 (Apache-2.0); Llama 3.2 via Ollama (Llama 3.2 Community License, Meta).
 The project page uses the scroll-craft engine (MIT) and Geist fonts (SIL OFL); see `site/README.md`.
+The web app vendors three.js 0.186.1 (MIT; see `web/vendor/three/VENDOR.md`) and Geist (SIL OFL).

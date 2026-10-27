@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Knowledge Assistant</title>
+  <meta name="description" content="Ask questions about your own documents. Answers cite their sources, and you can watch retrieval happen on a 3D map. Runs entirely on this computer.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230e1014'/><path d='M9 8.5h9.5a3 3 0 0 1 3 3V24H12a3 3 0 0 1-3-3z' fill='none' stroke='%23f2b544' stroke-width='2'/><path d='M12.5 13h5.5M12.5 17h4' stroke='%23eceef1' stroke-width='1.6' stroke-linecap='round'/></svg>">
+  <link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#question">Skip to the question box</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 8.5h9.5a3 3 0 0 1 3 3V24H12a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 13h5.5M12.5 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="brand-name">Knowledge Assistant</span>
+    </div>
+    <div class="status" id="status" role="status">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span class="status-text">Connecting…</span>
+    </div>
+    <dl class="facts">
+      <div><dt>Model</dt><dd id="fact-model">–</dd></div>
+      <div><dt>Passages</dt><dd id="fact-chunks">–</dd></div>
+    </dl>
+    <button class="btn btn-ghost" id="open-docs" type="button" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 3v4h4M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span>Documents</span>
+    </button>
+  </header>
+
+  <main class="layout">
+    <section class="chat" aria-label="Conversation">
+      <div class="messages" id="messages">
+        <div class="welcome" id="welcome">
+          <h1>Ask your documents.</h1>
+          <p class="lede">Answers come only from your files, every citation is checked, and when nothing matches well enough, it says so instead of guessing.</p>
+          <ol class="how">
+            <li><strong>Find.</strong> Your question becomes numbers that capture its meaning, and the closest passages light up on the map.</li>
+            <li><strong>Answer.</strong> A local model writes an answer using only those passages.</li>
+            <li><strong>Check.</strong> Every <code>[file, p. N]</code> it cites is checked against what it was given.</li>
+          </ol>
+          <div class="examples" id="examples" hidden>
+            <p class="examples-label">Try one</p>
+            <div class="example-list" id="example-list"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sr-only" aria-live="polite" id="announcer"></div>
+
+      <form class="composer" id="composer" novalidate>
+        <label class="sr-only" for="question">Your question</label>
+        <textarea id="question" name="question" rows="1" maxlength="1000" placeholder="Ask about your documents" autocomplete="off" required></textarea>
+        <button class="btn btn-primary" id="ask" type="submit">
+          <span>Ask</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="composer-hint" id="composer-hint"><kbd>Enter</kbd> to ask · <kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line · <kbd>/</kbd> to jump here</p>
+      </form>
+    </section>
+
+    <section class="map-panel" aria-labelledby="map-title">
+      <div class="map" id="map"></div>
+      <div class="map-head">
+        <h2 id="map-title">Knowledge map</h2>
+        <p class="map-sub" id="map-sub">Each dot is a passage from your documents. Passages with similar meaning sit close together.</p>
+        <ul class="legend" id="legend" aria-label="Documents on the map"></ul>
+      </div>
+      <div class="map-foot">
+        <p class="map-note" id="map-note"></p>
+        <button class="btn btn-ghost btn-small" id="reset-view" type="button">Reset view</button>
+      </div>
+      <div class="tooltip" id="tooltip" hidden></div>
+      <p class="map-fallback" id="map-fallback" hidden>The 3D map needs WebGL, which this browser doesn't offer. Everything else works the same: sources and scores are listed under each answer.</p>
+      <p class="sr-only" id="map-summary"></p>
+    </section>
+  </main>
+
+  <dialog class="docs" id="docs-dialog" aria-labelledby="docs-title">
+    <div class="docs-head">
+      <h2 id="docs-title">Documents</h2>
+      <button class="icon-btn" id="close-docs" type="button" aria-label="Close documents">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <ul class="doc-list" id="doc-list"></ul>
+
+    <label class="dropzone" id="dropzone" for="file">
+      <input class="sr-only" type="file" id="file" accept=".pdf,.md,.txt">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="dropzone-title">Drop a file here, or choose one</span>
+      <span class="dropzone-sub">PDF, Markdown or text, up to 10 MB</span>
+    </label>
+    <p class="field-msg" id="upload-msg" role="status"></p>
+
+    <div class="docs-foot">
+      <p class="docs-help">New files become searchable after a rebuild.</p>
+      <button class="btn btn-primary" id="rebuild" type="button">Rebuild index</button>
+    </div>
+    <p class="field-msg" id="rebuild-msg" role="status"></p>
+  </dialog>
+</body>
+</html>

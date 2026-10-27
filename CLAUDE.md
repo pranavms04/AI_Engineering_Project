@@ -40,7 +40,7 @@ It must be honest, well-tested, measured, and explainable in an interview.
    a phase prompt explicitly asks (a framework comparison comes late, as a demo).
 8. **Small steps.** One phase at a time. Don't start the next phase unasked.
 
-## 4. Current architecture (Stages 1–9 are built)
+## 4. Current architecture (Stages 1–10 are built, plus the 3D web app)
 
 ```
 INGESTION (scripts/build_index.py)          QUERY
@@ -75,7 +75,12 @@ Existing public APIs (do not break):
   `metrics.py` (recall_at_k, mrr, keyword_coverage, citation_accuracy, abstention_scores, percentile),
   `run_eval.py` (builds the index in memory, writes `results/*.json` with config + git commit). See `evaluation/README.md`.
 - `Settings` also has `chunk_size`/`chunk_overlap` (CHUNK_SIZE/CHUNK_OVERLAP, 500/100), used by API rebuild and build_index.
-- UI (`ui/streamlit_app.py`): calls the API over HTTP only (`API_URL`); helpers `call_api` → `ApiResult`,
+- Web app (`web/`, main UI): static HTML/CSS/JS served by the API at `/` (same origin, strict CSP:
+  only 'self'). `api.js` (fetch wrappers), `render.js` (safe text + citation chips, never innerHTML
+  for model text), `map.js` (three.js knowledge map), `app.js` (wiring). three.js 0.186.1 vendored in
+  `web/vendor/three/` (see VENDOR.md). Map data: `GET /index/map` (PCA of chunk embeddings,
+  `app/retrieval/projection.py`); `/ask` also returns `question_point` and `sources[].chunk_index`.
+- UI (`ui/streamlit_app.py`, fallback): calls the API over HTTP only (`API_URL`); helpers `call_api` → `ApiResult`,
   `remove_images()` before rendering LLM Markdown; `.streamlit/config.toml` binds to localhost.
   Look: `[theme]` in `.streamlit/config.toml` (site/ palette, Geist fonts from `ui/static/`), no custom CSS;
   `citation_check()` shows each citation as a green/red badge with words.
@@ -133,8 +138,8 @@ python -m scripts.build_index                   # rebuild FAISS index
 python -m scripts.search "question" -k 3        # retrieval only
 python -m scripts.ask "question"                # full RAG answer (needs Ollama running)
 ollama serve                                    # terminal 1: local LLM
-uvicorn app.api.main:app --reload               # terminal 2: API on 127.0.0.1:8000, docs at /docs
-streamlit run ui/streamlit_app.py               # terminal 3: UI on http://localhost:8501
+uvicorn app.api.main:app --reload               # terminal 2: API + 3D web app on http://localhost:8000 (/docs = API page)
+streamlit run ui/streamlit_app.py               # optional fallback UI on http://localhost:8501
 python -m evaluation.run_eval                   # retrieval metrics (no LLM)
 python -m evaluation.run_eval --with-llm        # full RAG metrics + latency (needs Ollama)
 python -m evaluation.run_eval --chunk-size 300 --overlap 100   # one-variable experiment

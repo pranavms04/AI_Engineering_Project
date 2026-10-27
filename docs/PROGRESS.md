@@ -16,6 +16,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 8 | Streamlit UI | ✅ done (restyled 2026-10-27, 135 tests total) | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
 | 9 | Evaluation | ✅ done | 123 total (+24, +8 follow-up) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
 | 10 | Docker, CI, README | ✅ done (CI to confirm on GitHub) | 123 total | `docker-compose up --build` verified with Ollama on the host; images: api 2.1 GB, ui 827 MB; non-root; ports on 127.0.0.1 |
+| 10b | 3D web app (three.js) | ✅ built (2026-10-27) | 152 total (+17) | `web/` served by the API; live knowledge map (PCA of embeddings), citation chips that fly to their passage; checked in browser and Docker |
 | 11 | Interview prep pack | ⬜ | | |
 
 ## Environment facts
@@ -87,7 +88,21 @@ Phase 10 Docker check (2026-10-27, Colima 2 CPU / 3 GB, Docker 29.5.2):
 - Both containers run as uid 10001 (app); API image contains no data/, storage/, PDFs or .env.
 - CI workflow parses; not yet run on GitHub (needs a push).
 
+3D web app check (2026-10-27, local API then Docker, llama3.2:3b, prompt v1):
+- `GET /index/map`: 35 points; the 3 map axes keep 18.4% + 10.5% + 8.9% (≈38%) of the embedding variation, shown in the app.
+- Alternative-docs question (cold, local): retrieve 3851 ms, generate 24265 ms, total 28120 ms; green `p. 4` chip; 4 passages lit on the map.
+  Same question through Docker: total 14117 ms.
+- Path-parameter question: red `p. 2` chip, "1 of 1 citations failed the check"; clicking it flew the camera to p. 2
+  (measured: camera (4.18, 2.6, 5.22) → (1.47, 2.2, 2.1)).
+- France: refused, "closest passage scored 0.120"; question lands on the map with no lines.
+- Upload + rebuild of an invented note: 15 pages/files, 36 passages in 9.61 s; answer cited it (2 green chips). Note deleted, index rebuilt (35).
+- Phone 375 px: no sideways scroll, every control ≥ 44 px. Keyboard: dialog traps focus, Escape returns focus, `/` jumps to the box.
+- Ollama stopped: status "Ollama offline", 503 card with Try again. Static serving: 5 traversal probes all 404.
+- Not verifiable in the browser pane: smooth 60 fps motion (the pane throttles to ~2 fps when hidden) and the reduced-motion setting.
+
 ## Bugs fixed (learning log)
+- 3D web app: the pinned map label and zoomed camera stayed on screen during the next question; fixed by clearing the label and easing the camera back on each new question.
+- 3D web app: after a rebuild some points were out of view, and fog hid points at the new distance; the camera now fits every point to the panel's shape and the fog follows the distance.
 - UI restyle (2026-10-27): the empty-state guide stayed visible while the first answer loaded (drawn before `st.chat_input` was read); fixed by reading the input first.
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.

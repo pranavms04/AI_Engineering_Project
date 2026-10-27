@@ -239,3 +239,85 @@ def test_cors_allows_streamlit_origin_only(make_client):
 
     assert allowed.headers.get("access-control-allow-origin") == "http://localhost:8501"
     assert "access-control-allow-origin" not in blocked.headers
+
+
+# ---------- knowledge map + web app ----------
+
+def test_index_map_returns_one_point_per_chunk(make_client):
+    client, _ = make_client()
+    body = client.get("/index/map").json()
+
+    assert len(body["points"]) == 3
+    assert [p["id"] for p in body["points"]] == [0, 1, 2]
+    assert {p["source"] for p in body["points"]} == {"guide.pdf", "notes.md"}
+    assert all(-1.0001 <= p[axis] <= 1.0001 for p in body["points"] for axis in "xyz")
+    assert len(body["explained_variance"]) == 3
+    assert all(p["preview"] for p in body["points"])
+
+
+def test_index_map_is_stable_between_calls(make_client):
+    client, _ = make_client()
+    assert client.get("/index/map").json() == client.get("/index/map").json()
+
+
+def test_index_map_is_empty_without_index(make_client):
+    client, _ = make_client(with_store=False)
+    body = client.get("/index/map").json()
+    assert body["points"] == []
+
+
+def test_ask_returns_question_point_and_chunk_ids(make_client):
+    client, _ = make_client()
+    body = client.post("/ask", json={"question": "How do I declare a typed path parameter?"}).json()
+
+    assert len(body["question_point"]) == 3
+    assert all(isinstance(v, float) for v in body["question_point"])
+    # The hand-made test chunks have no chunk_index; real ones do (see the rebuild test below).
+    assert "chunk_index" in body["sources"][0]
+
+
+def test_question_lands_nearer_its_best_source_than_an_unrelated_chunk(make_client):
+    client, _ = make_client()
+    points = {(p["source"], p["page"]): p for p in client.get("/index/map").json()["points"]}
+    body = client.post("/ask", json={"question": "How do I run the development server with uvicorn?"}).json()
+
+    q = body["question_point"]
+    def dist(p):
+        return sum((q[i] - p[axis]) ** 2 for i, axis in enumerate("xyz")) ** 0.5
+    assert body["sources"][0]["source"] == "notes.md"
+    assert dist(points[("notes.md", None)]) < dist(points[("guide.pdf", 1)])
+
+
+def test_rebuild_clears_the_cached_map(make_client):
+    client, state = make_client()
+    client.get("/index/map")
+    assert state.projection is not None
+    client.post("/documents", files={"file": ("ollama.md", b"Ollama listens on port 11434.", "text/markdown")})
+    client.post("/index/rebuild")
+    assert state.projection is None
+    assert [p["source"] for p in client.get("/index/map").json()["points"]] == ["ollama.md"]
+    answer = client.post("/ask", json={"question": "Which port does Ollama use?"}).json()
+    assert answer["sources"][0]["chunk_index"] == 0  # real chunks carry their index
+
+
+def test_web_app_is_served_with_strict_security_policy(make_client):
+    client, _ = make_client()
+    page = client.get("/")
+    assert page.status_code == 200
+    assert "text/html" in page.headers["content-type"]
+    csp = page.headers["content-security-policy"]
+    assert "script-src 'self'" in csp and "connect-src 'self'" in csp
+    assert page.headers["x-content-type-options"] == "nosniff"
+    assert client.get("/app.js").status_code == 200
+
+
+def test_api_docs_page_is_not_blocked_by_the_web_policy(make_client):
+    client, _ = make_client()
+    docs = client.get("/docs")
+    assert docs.status_code == 200
+    assert "content-security-policy" not in docs.headers
+
+
+def test_api_routes_still_win_over_the_web_mount(make_client):
+    client, _ = make_client()
+    assert client.get("/health").json()["status"] == "ok"

@@ -4,7 +4,8 @@
 # Apple GPU, so a containerised Ollama would be much slower. Start it first: `ollama serve`.
 #
 #   docker-compose up --build        # (Docker Desktop: docker compose up --build)
-#   open http://localhost:8501
+#   open http://localhost:8000       # the 3D web app (served by the api container)
+#   open http://localhost:8501       # the simpler Streamlit UI (fallback)
 services:
   api:
     build:

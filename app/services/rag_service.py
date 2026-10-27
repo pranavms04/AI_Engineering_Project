@@ -26,6 +26,8 @@ class Source:
     page: int | None
     score: float
     snippet: str
+    # Which chunk of that page/file. With source and page it identifies the chunk on the knowledge map.
+    chunk_index: int | None = None
 
 
 @dataclass
@@ -55,6 +57,7 @@ def _to_source(chunk: Chunk, score: float) -> Source:
         page=chunk.metadata.get("page"),
         score=round(score, 4),
         snippet=chunk.text[:SNIPPET_CHARS],
+        chunk_index=chunk.metadata.get("chunk_index"),
     )
 
 

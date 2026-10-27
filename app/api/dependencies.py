@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 
 from app.config import Settings
 from app.generation.llm_client import LLMClient, OllamaClient
+from app.retrieval.projection import Projection, fit_projection
 from app.retrieval.vector_store import VectorStore
 
 logger = logging.getLogger(__name__)
@@ -21,6 +22,20 @@ class AppState:
     store: VectorStore | None
     # Only one rebuild at a time. /ask keeps working with the old store until the new one is swapped in.
     rebuild_lock: threading.Lock = field(default_factory=threading.Lock)
+    # 3-d projection for the knowledge map. Built on first use, cleared when the store is replaced.
+    projection: Projection | None = None
+
+    def get_projection(self) -> Projection | None:
+        if self.store is None or len(self.store) == 0:
+            return None
+        if self.projection is None:
+            vectors = self.store.index.reconstruct_n(0, self.store.index.ntotal)
+            self.projection = fit_projection(vectors)
+        return self.projection
+
+    def replace_store(self, store: VectorStore) -> None:
+        self.store = store
+        self.projection = None
 
 
 def load_store(settings: Settings) -> VectorStore | None:

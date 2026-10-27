@@ -31,6 +31,8 @@ ENV HF_HUB_OFFLINE=1
 
 COPY --chown=app:app app ./app
 COPY --chown=app:app scripts ./scripts
+# The 3D web app (static files, three.js vendored). The API serves it at http://localhost:8000/.
+COPY --chown=app:app web ./web
 EXPOSE 8000
 CMD ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
