@@ -15,7 +15,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
 | 8 | Streamlit UI | ✅ done | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
 | 9 | Evaluation | ✅ done | 123 total (+24, +8 follow-up) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
-| 10 | Docker, CI, README | ⬜ | | |
+| 10 | Docker, CI, README | ✅ done (CI to confirm on GitHub) | 123 total | `docker-compose up --build` verified with Ollama on the host; images: api 2.1 GB, ui 827 MB; non-root; ports on 127.0.0.1 |
 | 11 | Interview prep pack | ⬜ | | |
 
 ## Environment facts
@@ -78,6 +78,14 @@ Phase 9 follow-up (2026-10-25): `_is_abstain` and citation pattern fixed (see Bu
 - 3 fresh runs: citation accuracy 0.870 / 0.905 / 0.895; final abstention P/R = strict P/R in every run
   (0.625/0.833, 0.556/0.833, 0.625/0.833); remaining invalid citations are real wrong pages (q01 p. 2, q06 p. 4, q08 p. 7 once).
   Latency p50 5905 / 5173 / 7359 ms: not comparable to baseline (Mac also running a browser and a web server).
+
+Phase 10 Docker check (2026-10-27, Colima 2 CPU / 3 GB, Docker 29.5.2):
+- `docker-compose up --build -d`: exit 0 in 2 s (all layers cached); API container healthy.
+- `/health` from the container: `llm_reachable: true` (Ollama on the host via host.docker.internal), 35 chunks.
+- `/ask` path-parameter question: 9467.6 ms total (generate 8379.3, first question); same invalid p. 2 citation as Phase 9.
+- `/ask` France: abstained, 70.6 ms. UI in browser: "Pydantic" for q06 with the known invalid p. 4 citation flagged, 3685 ms.
+- Both containers run as uid 10001 (app); API image contains no data/, storage/, PDFs or .env.
+- CI workflow parses; not yet run on GitHub (needs a push).
 
 ## Bugs fixed (learning log)
 - Stale test import after renaming `load_document` → `load_file`.

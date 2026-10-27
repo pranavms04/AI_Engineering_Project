@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# The workflow only needs to read the code.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TOKENIZERS_PARALLELISM: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      # CPU-only PyTorch from the official CPU index, before anything else pulls the
+      # much larger default build. Same version as the Dockerfile.
+      - name: Install CPU-only PyTorch
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch==2.14.1
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      # The embedding tests use the real MiniLM model (~90 MB). Cache it between runs.
+      - name: Cache MiniLM
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-all-MiniLM-L6-v2-v1
+
+      # No Ollama here: every LLM call in the tests uses FakeLLMClient.
+      - name: Run tests
+        run: python -m pytest -q

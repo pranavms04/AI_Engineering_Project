@@ -1,0 +1,43 @@
+# API + UI in containers, Ollama on the host.
+#
+# Why Ollama stays on the host: Docker on a Mac runs in a Linux VM with no access to the
+# Apple GPU, so a containerised Ollama would be much slower. Start it first: `ollama serve`.
+#
+#   docker-compose up --build        # (Docker Desktop: docker compose up --build)
+#   open http://localhost:8501
+services:
+  api:
+    build:
+      context: .
+      target: api
+    image: ai-knowledge-assistant-api
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Your documents and the index stay on your computer, not in the image.
+      - ./data:/app/data
+      - ./storage:/app/storage
+    ports:
+      # 127.0.0.1 only: nobody else on your network can reach the API.
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  ui:
+    build:
+      context: .
+      target: ui
+    image: ai-knowledge-assistant-ui
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "127.0.0.1:8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy

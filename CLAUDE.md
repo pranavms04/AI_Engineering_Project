@@ -137,7 +137,15 @@ python -m evaluation.run_eval                   # retrieval metrics (no LLM)
 python -m evaluation.run_eval --with-llm        # full RAG metrics + latency (needs Ollama)
 python -m evaluation.run_eval --chunk-size 300 --overlap 100   # one-variable experiment
 python -m evaluation.run_eval --sweep-min-score 0.2,0.3,0.4    # abstain-gate sweep
+python -m evaluation.rescore evaluation/results/<run>-llm-*.json   # re-score saved answers, no LLM
+colima start --cpu 2 --memory 3 --disk 20       # Docker VM on this Mac (Colima, not Docker Desktop)
+docker-compose up --build                       # API + UI containers; Ollama stays on the host
 ```
+
+Packaging: `Dockerfile` has two targets (`api`: CPU-only torch 2.14.1 + MiniLM baked in,
+offline; `ui`: Streamlit only). `requirements.txt` = `requirements-api.txt` +
+`requirements-ui.txt` + pytest. CI: `.github/workflows/ci.yml` runs pytest on every push.
+Runbook: `docs/RUNBOOK.md`.
 
 ## 8. Known gotchas
 

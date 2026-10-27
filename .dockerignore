@@ -1,0 +1,17 @@
+# Keep the build context small and keep private data out of images.
+.git
+.venv
+.env
+.claude
+.pytest_cache
+**/__pycache__
+**/*.pyc
+data
+storage
+scrollcraft
+node_modules
+site
+docs
+evaluation
+tests
+*.md
