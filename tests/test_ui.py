@@ -4,7 +4,19 @@ import httpx
 import pytest
 from streamlit.testing.v1 import AppTest
 
-from ui.streamlit_app import ApiResult, ask, error_message, format_details, get_health, remove_images, upload
+from app.generation.citations import extract_citations as app_extract_citations
+from ui.streamlit_app import (
+    ApiResult,
+    ask,
+    citation_check,
+    error_message,
+    extract_citations,
+    format_details,
+    get_health,
+    health_summary,
+    remove_images,
+    upload,
+)
 
 # HTTP is faked with httpx.MockTransport: no API, no Ollama, no browser.
 
@@ -134,3 +146,97 @@ def test_ui_never_imports_app_internals():
     source = APP_FILE.read_text(encoding="utf-8")
     assert "from app" not in source
     assert "import app" not in source
+
+
+# ---------- restyle: citation check, status badge, rendered answer ----------
+
+CITATION_SAMPLES = [
+    "Use item_id: int [guide.pdf, p. 1]. See also [notes.md].",
+    "Same twice [guide.pdf, p. 2] and [guide.pdf, p. 2].",
+    "Code is not a citation: return [user.value] or items[0].",
+    "Case [Guide.PDF, p. 3] and spacing [guide.pdf,p.4].",
+]
+
+
+@pytest.mark.parametrize("text", CITATION_SAMPLES)
+def test_ui_citation_rule_matches_the_app(text):
+    # The UI keeps its own copy of the pattern (it may not import app.*), so it must agree with the app.
+    assert extract_citations(text) == app_extract_citations(text)
+
+
+def test_citation_check_marks_flagged_tags_invalid():
+    answer = {
+        "answer": "Typed with int [guide.pdf, p. 1] and validated [guide.pdf, p. 2].",
+        "invalid_citations": ["[guide.pdf, p. 2]"],
+    }
+    assert citation_check(answer) == [
+        {"tag": "[guide.pdf, p. 1]", "valid": True},
+        {"tag": "[guide.pdf, p. 2]", "valid": False},
+    ]
+
+
+def test_citation_check_keeps_api_flags_the_pattern_missed():
+    answer = {"answer": "No tags here.", "invalid_citations": ["[odd.pdf, p. 9]"]}
+    assert citation_check(answer) == [{"tag": "[odd.pdf, p. 9]", "valid": False}]
+
+
+@pytest.mark.parametrize(
+    "health, words",
+    [
+        ({"index_loaded": True, "llm_reachable": True}, "Ready"),
+        ({"index_loaded": True, "llm_reachable": False}, "Ollama offline"),
+        ({"index_loaded": False, "llm_reachable": True}, "No index yet"),
+    ],
+)
+def test_health_summary_always_has_words_not_only_colour(health, words):
+    colour, icon, text = health_summary(health)
+    assert text == words
+    assert icon.startswith(":material/")
+    assert colour in {"green", "orange"}
+
+
+def _render(answer: dict):
+    def script(answer):
+        from ui.streamlit_app import render_answer
+
+        render_answer({"role": "assistant", "answer": answer})
+
+    return AppTest.from_function(script, args=(answer,), default_timeout=30).run()
+
+
+ANSWER = {
+    "answer": "Declare it with a type annotation [guide.pdf, p. 2].",
+    "abstained": False,
+    "invalid_citations": ["[guide.pdf, p. 2]"],
+    "sources": [
+        {"citation": "[guide.pdf, p. 1]", "source": "guide.pdf", "page": 1, "score": 0.47, "snippet": "item_id: int"},
+    ],
+    "prompt_version": "v1",
+    "model": "fake",
+    "timings_ms": {"retrieve": 10.0, "generate": 20.0, "total": 30.0},
+}
+
+
+def test_rendered_answer_shows_invalid_citation_in_words():
+    page = _render(ANSWER)
+    assert not page.exception
+    text = " ".join(m.value for m in page.markdown)
+    assert "not among the 1 sources the model was given" in text
+    assert len(page.get("progress")) == 1  # one score bar per source
+    assert "score 0.470" in str(page.get("progress")[0].proto)
+
+
+def test_rendered_abstention_is_info_not_error():
+    abstained = dict(ANSWER, answer="I couldn't find this in the documents.", abstained=True, invalid_citations=[],
+                     timings_ms={"retrieve": 5.0, "generate": 0.0, "total": 5.0})
+    page = _render(abstained)
+    assert not page.exception
+    assert len(page.info) == 1 and len(page.error) == 0
+    assert any("nothing was sent to the LLM" in c.value for c in page.caption)
+
+
+def test_ui_uses_no_emoji_icons():
+    import re
+
+    source = APP_FILE.read_text(encoding="utf-8")
+    assert not re.search(r"[\U0001F300-\U0001FAFF]", source)

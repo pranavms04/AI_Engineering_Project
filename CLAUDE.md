@@ -77,6 +77,8 @@ Existing public APIs (do not break):
 - `Settings` also has `chunk_size`/`chunk_overlap` (CHUNK_SIZE/CHUNK_OVERLAP, 500/100), used by API rebuild and build_index.
 - UI (`ui/streamlit_app.py`): calls the API over HTTP only (`API_URL`); helpers `call_api` → `ApiResult`,
   `remove_images()` before rendering LLM Markdown; `.streamlit/config.toml` binds to localhost.
+  Look: `[theme]` in `.streamlit/config.toml` (site/ palette, Geist fonts from `ui/static/`), no custom CSS;
+  `citation_check()` shows each citation as a green/red badge with words.
 - `vector_store.VectorStore.build(chunks)`, `.search(query, k) -> [(Chunk, score)]`,
   `.save(folder)`, `.load(folder)` (rejects index built with another model).
 

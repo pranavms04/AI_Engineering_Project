@@ -13,7 +13,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 0 | Audit + stabilise | ✅ done | 21 total | .gitignore, pinned requirements, .env.example, README stub |
 | 6 | Local LLM answers + citations | ✅ done | 44 total (+23) | real run: grounded answer, but 1 invalid citation (p. 2 instead of p. 1) caught by validator |
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
-| 8 | Streamlit UI | ✅ done | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
+| 8 | Streamlit UI | ✅ done (restyled 2026-10-27, 135 tests total) | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
 | 9 | Evaluation | ✅ done | 123 total (+24, +8 follow-up) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
 | 10 | Docker, CI, README | ✅ done (CI to confirm on GitHub) | 123 total | `docker-compose up --build` verified with Ollama on the host; images: api 2.1 GB, ui 827 MB; non-root; ports on 127.0.0.1 |
 | 11 | Interview prep pack | ⬜ | | |
@@ -88,6 +88,7 @@ Phase 10 Docker check (2026-10-27, Colima 2 CPU / 3 GB, Docker 29.5.2):
 - CI workflow parses; not yet run on GitHub (needs a push).
 
 ## Bugs fixed (learning log)
+- UI restyle (2026-10-27): the empty-state guide stayed visible while the first answer loaded (drawn before `st.chat_input` was read); fixed by reading the input first.
 - Stale test import after renaming `load_document` → `load_file`.
 - Missing `app/ingestion/chunking.py` caused `ModuleNotFoundError`.
 - pytest collected only 5 tests: missing `test_*.py` files.

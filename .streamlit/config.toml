@@ -3,6 +3,8 @@
 address = "localhost"
 # Match the API's 10 MB upload limit (MAX_UPLOAD_MB) so the browser refuses big files early.
 maxUploadSize = 10
+# Serve ui/static/ (only the Geist font files and their licence) at app/static/.
+enableStaticServing = true
 
 [client]
 # Hide the "Deploy" button (it is for Streamlit's cloud hosting; this app stays local).
@@ -11,3 +13,48 @@ toolbarMode = "minimal"
 [browser]
 # Keep the app private: don't send usage statistics to Streamlit.
 gatherUsageStats = false
+
+# ---------- Look: the same palette and type as the project page in site/ ----------
+# Off-black canvas, one amber accent, Geist for text, Geist Mono for citations and code.
+[theme]
+base = "dark"
+primaryColor = "#f2b544"
+backgroundColor = "#0e1014"
+secondaryBackgroundColor = "#171a20"
+textColor = "#eceef1"
+borderColor = "#262b33"
+showWidgetBorder = true
+baseRadius = "0.5rem"
+buttonRadius = "0.5rem"
+linkColor = "#f2b544"
+linkUnderline = true
+codeBackgroundColor = "#171a20"
+codeTextColor = "#eceef1"
+# Status colours, tuned to stay readable on the dark canvas.
+greenColor = "#7fd19b"
+redColor = "#ff7b72"
+orangeColor = "#f2b544"
+blueColor = "#8ab4f8"
+grayColor = "#a3abb6"
+font = "Geist, system-ui, sans-serif"
+codeFont = "Geist Mono, ui-monospace, monospace"
+headingFont = "Geist, system-ui, sans-serif"
+headingFontWeights = [650, 600, 600, 600, 600, 600]
+baseFontSize = 16
+
+[[theme.fontFaces]]
+family = "Geist"
+url = "app/static/Geist-Variable.woff2"
+weight = "100 900"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Geist Mono"
+url = "app/static/GeistMono-Variable.woff2"
+weight = "100 900"
+style = "normal"
+
+[theme.sidebar]
+backgroundColor = "#13161b"
+secondaryBackgroundColor = "#1b1f26"
+borderColor = "#262b33"
