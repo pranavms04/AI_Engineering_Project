@@ -15,7 +15,7 @@ Record only facts: what exists, what passed, real measured numbers.
 | 7 | FastAPI backend | ✅ done | 75 total (+31) | /health, /ask, /documents (GET/POST), /index/rebuild; upload allow-list, 10 MB limit, path-traversal safe |
 | 8 | Streamlit UI | ✅ done (restyled 2026-10-27, 135 tests total) | 91 total (+16) | one-file UI over HTTP; all error states checked in the browser; bound to localhost; Markdown images stripped |
 | 9 | Evaluation | ✅ done | 123 total (+24, +8 follow-up) | 30-question set; recall@4 0.958, MRR@10 0.803; citation acc. 0.750–0.905 over 3 LLM runs; kept 500/100 and MIN_SCORE 0.30 after experiments |
-| 10 | Docker, CI, README | ✅ done (CI to confirm on GitHub) | 123 total | `docker-compose up --build` verified with Ollama on the host; images: api 2.1 GB, ui 827 MB; non-root; ports on 127.0.0.1 |
+| 10 | Docker, CI, README | ✅ done (CI green on GitHub 2026-10-27) | 123 total | `docker-compose up --build` verified with Ollama on the host; images: api 2.1 GB, ui 827 MB; non-root; ports on 127.0.0.1 |
 | 10b | 3D web app (three.js) | ✅ built (2026-10-27) | 152 total (+17) | `web/` served by the API; live knowledge map (PCA of embeddings), citation chips that fly to their passage; checked in browser and Docker |
 | 11 | Interview prep pack | ⬜ | | |
 
@@ -86,7 +86,8 @@ Phase 10 Docker check (2026-10-27, Colima 2 CPU / 3 GB, Docker 29.5.2):
 - `/ask` path-parameter question: 9467.6 ms total (generate 8379.3, first question); same invalid p. 2 citation as Phase 9.
 - `/ask` France: abstained, 70.6 ms. UI in browser: "Pydantic" for q06 with the known invalid p. 4 citation flagged, 3685 ms.
 - Both containers run as uid 10001 (app); API image contains no data/, storage/, PDFs or .env.
-- CI workflow parses; not yet run on GitHub (needs a push).
+- CI verified on GitHub (2026-10-27): first run, run id 40487041372, commit `3fd72f6`, job `test` succeeded
+  (all steps green: CPU torch, requirements, MiniLM cache, 152 tests), 10:15:25 → 10:16:44 UTC (1 min 19 s).
 
 3D web app check (2026-10-27, local API then Docker, llama3.2:3b, prompt v1):
 - `GET /index/map`: 35 points; the 3 map axes keep 18.4% + 10.5% + 8.9% (≈38%) of the embedding variation, shown in the app.
