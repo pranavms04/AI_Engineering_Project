@@ -292,6 +292,10 @@ svg { width: 1.15em; height: 1.15em; flex: none; }
 }
 .doc-list .count { margin-left: auto; color: var(--ink-soft); font-family: var(--font); }
 .doc-empty { color: var(--ink-soft); font-family: var(--font) !important; }
+.demo-note {
+  margin: 0 0 4px; padding: 12px 14px; font-size: 0.88rem; color: var(--ink);
+  background: var(--accent-tint); border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); border-radius: var(--r-sm);
+}
 .dropzone {
   display: grid; justify-items: center; gap: 4px; padding: 22px 16px; text-align: center;
   border: 1.5px dashed #39404b; border-radius: var(--r); cursor: pointer; color: var(--ink-soft);

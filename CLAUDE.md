@@ -29,6 +29,9 @@ It must be honest, well-tested, measured, and explainable in an interview.
 
 1. **Zero cost.** No paid APIs (no OpenAI/Anthropic/Gemini keys), no paid
    hosting, no services that need a credit card. Everything runs locally.
+   One deliberate exception: the free Hugging Face Space demo (`deploy/huggingface/`,
+   `docs/DEPLOY_HUGGINGFACE.md`), which runs Ollama inside the container with `DEMO_MODE=1`
+   (no uploads/rebuilds).
 2. **Local LLM only, via Ollama** (HTTP API at `http://localhost:11434`).
 3. **Never invent results.** No made-up metrics, benchmarks, latency numbers or
    evaluation scores — in code, docs, README or chat. Only report numbers you

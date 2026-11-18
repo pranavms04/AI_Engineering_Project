@@ -87,7 +87,9 @@
       </button>
     </div>
     <ul class="doc-list" id="doc-list"></ul>
+    <p class="demo-note" id="demo-note" hidden>This is the public demo, so uploads and rebuilds are switched off. To use your own documents, run PageProof on your computer (free, about 10 minutes): see the README.</p>
 
+    <div id="docs-edit">
     <label class="dropzone" id="dropzone" for="file">
       <input class="sr-only" type="file" id="file" accept=".pdf,.md,.txt">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -101,6 +103,7 @@
       <button class="btn btn-primary" id="rebuild" type="button">Rebuild index</button>
     </div>
     <p class="field-msg" id="rebuild-msg" role="status"></p>
+    </div>
   </dialog>
 </body>
 </html>

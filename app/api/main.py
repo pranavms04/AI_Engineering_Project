@@ -82,7 +82,17 @@ def health(state: AppState = Depends(get_state)) -> HealthOut:
         chunks=len(state.store) if index_loaded else 0,
         llm_reachable=llm_reachable,
         model=state.llm.model,
+        demo_mode=state.settings.demo_mode,
     )
+
+
+DEMO_MODE_MESSAGE = "Disabled in the public demo. Run PageProof locally to use your own documents."
+
+
+def refuse_in_demo(state: AppState) -> None:
+    """In the public demo, nobody may change the documents or the index."""
+    if state.settings.demo_mode:
+        raise HTTPException(403, DEMO_MODE_MESSAGE)
 
 
 @app.post(
@@ -147,9 +157,10 @@ def list_documents(state: AppState = Depends(get_state)) -> list[DocumentOut]:
     "/documents",
     response_model=UploadOut,
     status_code=201,
-    responses={400: {"model": ErrorOut}, 409: {"model": ErrorOut}, 413: {"model": ErrorOut}, 415: {"model": ErrorOut}},
+    responses={400: {"model": ErrorOut}, 403: {"model": ErrorOut}, 409: {"model": ErrorOut}, 413: {"model": ErrorOut}, 415: {"model": ErrorOut}},
 )
 async def upload_document(file: UploadFile, state: AppState = Depends(get_state)) -> UploadOut:
+    refuse_in_demo(state)
     max_bytes = state.settings.max_upload_mb * 1024 * 1024
     try:
         name = safe_filename(file.filename)
@@ -164,8 +175,9 @@ async def upload_document(file: UploadFile, state: AppState = Depends(get_state)
     return UploadOut(filename=name, bytes=len(content), message="Saved. Run POST /index/rebuild to make it searchable.")
 
 
-@app.post("/index/rebuild", response_model=RebuildOut, responses={400: {"model": ErrorOut}, 409: {"model": ErrorOut}})
+@app.post("/index/rebuild", response_model=RebuildOut, responses={400: {"model": ErrorOut}, 403: {"model": ErrorOut}, 409: {"model": ErrorOut}})
 def rebuild(state: AppState = Depends(get_state)) -> RebuildOut:
+    refuse_in_demo(state)
     # Synchronous: the request waits until the index is rebuilt. Fine for a demo;
     # a real app would run this as a background job and let the client poll.
     if not state.rebuild_lock.acquire(blocking=False):

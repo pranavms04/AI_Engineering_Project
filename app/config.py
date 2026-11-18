@@ -20,6 +20,8 @@ class Settings:
     max_upload_mb: int = 10
     chunk_size: int = 500
     chunk_overlap: int = 100
+    # Public demo (e.g. the Hugging Face Space): uploads and rebuilds are switched off.
+    demo_mode: bool = False
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -36,4 +38,5 @@ class Settings:
             max_upload_mb=int(_env("MAX_UPLOAD_MB", str(defaults.max_upload_mb))),
             chunk_size=int(_env("CHUNK_SIZE", str(defaults.chunk_size))),
             chunk_overlap=int(_env("CHUNK_OVERLAP", str(defaults.chunk_overlap))),
+            demo_mode=_env("DEMO_MODE", "0").strip().lower() in {"1", "true", "yes"},
         )

@@ -55,7 +55,7 @@ def make_client(store, tmp_path):
 def test_health_ok_when_index_loaded_and_llm_reachable(make_client):
     client, _ = make_client()
     body = client.get("/health").json()
-    assert body == {"status": "ok", "index_loaded": True, "chunks": 3, "llm_reachable": True, "model": "fake-llm"}
+    assert body == {"status": "ok", "index_loaded": True, "chunks": 3, "llm_reachable": True, "model": "fake-llm", "demo_mode": False}
 
 
 def test_health_degraded_when_llm_down_and_no_index(make_client):
@@ -321,3 +321,27 @@ def test_api_docs_page_is_not_blocked_by_the_web_policy(make_client):
 def test_api_routes_still_win_over_the_web_mount(make_client):
     client, _ = make_client()
     assert client.get("/health").json()["status"] == "ok"
+
+
+# ---------- public demo mode ----------
+
+def test_demo_mode_refuses_uploads_and_rebuilds(make_client):
+    client, state = make_client(demo_mode=True)
+    upload = client.post("/documents", files={"file": ("notes.md", b"# hi", "text/markdown")})
+    rebuild = client.post("/index/rebuild")
+
+    assert upload.status_code == 403
+    assert "public demo" in upload.json()["detail"]
+    assert rebuild.status_code == 403
+    assert not (state.settings.docs_dir / "notes.md").exists()
+
+
+def test_demo_mode_still_answers_questions(make_client):
+    client, _ = make_client(demo_mode=True)
+    assert client.get("/health").json()["demo_mode"] is True
+    assert client.post("/ask", json={"question": "How do I declare a typed path parameter?"}).status_code == 200
+
+
+def test_demo_mode_is_off_by_default(make_client):
+    client, _ = make_client()
+    assert client.get("/health").json()["demo_mode"] is False

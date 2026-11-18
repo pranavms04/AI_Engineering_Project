@@ -77,6 +77,7 @@ class HealthOut(BaseModel):
     chunks: int
     llm_reachable: bool
     model: str
+    demo_mode: bool = False
 
 
 class ErrorOut(BaseModel):

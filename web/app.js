@@ -36,6 +36,8 @@ const ui = {
   uploadMsg: $("upload-msg"),
   rebuild: $("rebuild"),
   rebuildMsg: $("rebuild-msg"),
+  docsEdit: $("docs-edit"),
+  demoNote: $("demo-note"),
 };
 
 const state = { health: null, map: null, busy: false };
@@ -68,9 +70,13 @@ async function refreshStatus() {
   const h = (state.health = result.data);
   ui.model.textContent = h.model;
   ui.chunks.textContent = String(h.chunks);
+  // Public demo: the API refuses uploads and rebuilds, so don't offer them.
+  ui.docsEdit.hidden = Boolean(h.demo_mode);
+  ui.demoNote.hidden = !h.demo_mode;
+  const demo = h.demo_mode ? " · public demo" : "";
   if (!h.index_loaded) setStatus("warn", "No index yet");
   else if (!h.llm_reachable) setStatus("warn", "Ollama offline");
-  else setStatus("ok", "Ready");
+  else setStatus("ok", `Ready${demo}`);
 }
 
 function setStatus(kind, words) {

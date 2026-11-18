@@ -11,3 +11,7 @@ data/sample_docs/*
 # scroll-craft working files (brief, raw captures, test screenshots). The published page lives in site/.
 scrollcraft/
 node_modules/
+
+# Hugging Face Space folder (contains the sample PDF; pushed to the Space only)
+hf-space/
+linkedin-post/

@@ -134,3 +134,12 @@ def test_is_reachable_false_when_ollama_is_down():
         raise httpx.ConnectError("connection refused")
 
     assert make_client(handler).is_reachable() is False
+
+
+def test_demo_mode_reads_env(monkeypatch):
+    from app.config import Settings
+
+    monkeypatch.setenv("DEMO_MODE", "1")
+    assert Settings.from_env().demo_mode is True
+    monkeypatch.setenv("DEMO_MODE", "0")
+    assert Settings.from_env().demo_mode is False
