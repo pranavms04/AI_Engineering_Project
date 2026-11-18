@@ -1,10 +1,26 @@
-# Deploy the public demo to Hugging Face Spaces
+# Deploy to Hugging Face Spaces
 
-A free Space (CPU basic: 2 vCPU, 16 GB RAM, no GPU, no credit card) runs PageProof in one Docker
+> **Update 2026-11-18: Docker and Gradio Spaces now require a paid plan (PRO).** Hugging Face's docs:
+> "Static Spaces are free for everyone. Gradio and Docker Spaces run on compute and require a paid plan".
+> To stay at ₹0, PageProof uses a **free Static Space** for the project page (below). The Docker recipe in
+> `deploy/huggingface/` (live LLM, `DEMO_MODE=1`) is kept for anyone with a paid plan, but is **not deployed**.
+
+## Free: Static Space (project page)
+1. https://huggingface.co/new-space → Space name `pageproof` → SDK **Static** → template **Blank** → **Public** → Create.
+2. Build the folder (git-ignored): copy `site/` without `tools/`, plus a Space card (`sdk: static`):
+   it is already in `hf-static/`.
+3. On the Space: **Files → + Contribute → Upload files**, drag in everything inside `hf-static/`
+   (files and the `assets/`, `data/`, `fonts/` folders), commit. The page is live at
+   `https://huggingface.co/spaces/<user>/pageproof`.
+
+---
+
+# Paid option: live demo (Docker Space)
+
+With a paid plan, a Docker Space on CPU Basic hardware (2 vCPU, 16 GB RAM, no GPU) can run PageProof in one
 container: Ollama + llama3.2:3b, MiniLM, FAISS, the API and the 3D web app on port 7860.
 
-**This is the one deliberate exception to "everything runs locally" (CLAUDE.md §3).** It is still free
-and still uses Ollama, but it is hosted and public, so it runs in **demo mode** (`DEMO_MODE=1`):
+It would be hosted and public, so it runs in **demo mode** (`DEMO_MODE=1`):
 uploads and rebuilds return 403 and are hidden in the web app. Only the sample FastAPI PDF is served.
 
 ## Files

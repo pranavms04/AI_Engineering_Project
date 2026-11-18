@@ -15,3 +15,4 @@ node_modules/
 # Hugging Face Space folder (contains the sample PDF; pushed to the Space only)
 hf-space/
 linkedin-post/
+hf-static/
