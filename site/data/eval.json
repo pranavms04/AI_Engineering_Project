@@ -198,40 +198,40 @@
   ],
   "llm_runs": [
     {
-      "file": "20261025-220558-llm-c500o100.json",
-      "citation_accuracy": 0.75,
-      "answers_with_invalid_citation": 5,
+      "file": "20261025-230001-llm-c500o100.json",
+      "citation_accuracy": 0.8695652173913043,
+      "answers_with_invalid_citation": 3,
       "abstention_true_positives": 5,
       "abstention_missed": [
         "How do I deploy a FastAPI app with Docker?"
       ],
-      "generate_p50_ms": 4665.450000000001,
-      "total_p50_ms": 4924.75,
-      "total_p95_ms": 11759.434999999998
+      "generate_p50_ms": 5240.1,
+      "total_p50_ms": 5905.15,
+      "total_p95_ms": 16452.045
     },
     {
-      "file": "20261025-220910-llm-c500o100.json",
-      "citation_accuracy": 0.8260869565217391,
-      "answers_with_invalid_citation": 4,
-      "abstention_true_positives": 5,
-      "abstention_missed": [
-        "How do I deploy a FastAPI app with Docker?"
-      ],
-      "generate_p50_ms": 3292.8500000000004,
-      "total_p50_ms": 3420.3,
-      "total_p95_ms": 8686.235
-    },
-    {
-      "file": "20261025-221228-llm-c500o100.json",
+      "file": "20261025-230404-llm-c500o100.json",
       "citation_accuracy": 0.9047619047619048,
       "answers_with_invalid_citation": 2,
       "abstention_true_positives": 5,
       "abstention_missed": [
         "How do I deploy a FastAPI app with Docker?"
       ],
-      "generate_p50_ms": 2442.2,
-      "total_p50_ms": 2591.2,
-      "total_p95_ms": 10927.229999999989
+      "generate_p50_ms": 4596.85,
+      "total_p50_ms": 5172.9,
+      "total_p95_ms": 19869.0
+    },
+    {
+      "file": "20261025-230830-llm-c500o100.json",
+      "citation_accuracy": 0.8947368421052632,
+      "answers_with_invalid_citation": 2,
+      "abstention_true_positives": 5,
+      "abstention_missed": [
+        "How do I deploy a FastAPI app with Docker?"
+      ],
+      "generate_p50_ms": 6343.65,
+      "total_p50_ms": 7358.5,
+      "total_p95_ms": 18777.424999999996
     }
   ]
 }

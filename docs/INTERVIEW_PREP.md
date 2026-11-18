@@ -1,5 +1,7 @@
 # Interview prep: PageProof (AI Knowledge Assistant)
 
+Live project page: https://huggingface.co/spaces/pranavms04/pageproof (also GitHub Pages). Code: https://github.com/pranavms04/AI_Engineering_Project
+
 Everything here is about **this** repo. Every number comes from a file you can open
 (`evaluation/results/*.json`, `docs/PROGRESS.md`). If you can't point at where a number came
 from, don't say it.
@@ -26,7 +28,7 @@ from, don't say it.
    embedded the same way, the top 4 chunks are retrieved, a score gate (0.30) decides whether to call
    the LLM, and a strict prompt makes it answer only from those chunks.
 4. **Proof:** a 30-question evaluation (Recall@k, MRR, citation accuracy, abstention, latency),
-   152 tests in GitHub Actions, Docker for one-command start.
+   156 tests in GitHub Actions, Docker for one-command start.
 5. **What I learned:** a valid citation isn't a correct answer, LLM results vary between identical
    runs so you report ranges, and evaluation finds bugs that unit tests miss.
 
@@ -63,7 +65,7 @@ from, don't say it.
 | Off-topic refusal | "capital of France" best score 0.120 < 0.30, LLM not called | `docs/PROGRESS.md` |
 | Latency, full answer (p50) | 2.6–4.9 s across 3 runs on an 8 GB M1 | baseline LLM runs |
 | 3D map | PCA keeps ≈38% of the variance (18.4 + 10.5 + 8.9%) | `GET /index/map` |
-| Tests | **152**, CI green on GitHub (first run 1 min 19 s) | `pytest`, Actions run 40487041372 |
+| Tests | **156**, CI green on GitHub (first run 1 min 19 s) | `pytest`, Actions run 40487041372 |
 | Docker image | API 2.1 GB (CPU torch + MiniLM), UI 828 MB | `docker images` |
 
 ---
@@ -184,7 +186,7 @@ from, don't say it.
 - Designed a 30-question evaluation (Recall@k, MRR, citation accuracy, abstention, latency) with recorded
   config; reached Recall@4 of 0.958 and chose chunking and the refusal threshold by controlled experiments.
 - Found and fixed two evaluation-exposed bugs (refusal detection, citation parsing); tested a prompt-change
-  hypothesis over 3 runs each and rejected it on the data; 152 pytest tests in GitHub Actions, Docker (non-root, localhost-only).
+  hypothesis over 3 runs each and rejected it on the data; 156 pytest tests in GitHub Actions, Docker (non-root, localhost-only).
 - Built a three.js web app that visualises retrieval in a PCA projection of the embedding space, with strict
   CSP and safe rendering of model output.
 

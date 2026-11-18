@@ -8,10 +8,12 @@ from pathlib import Path
 
 RESULTS = Path("evaluation/results")
 RETRIEVAL = "20261025-221343-retrieval-c500o100.json"
+# The three full runs after the Phase 9 fixes (strict refusal check, citations limited to
+# indexable file types). Same config as the earlier runs; see evaluation/README.md.
 LLM_RUNS = [
-    "20261025-220558-llm-c500o100.json",
-    "20261025-220910-llm-c500o100.json",
-    "20261025-221228-llm-c500o100.json",
+    "20261025-230001-llm-c500o100.json",
+    "20261025-230404-llm-c500o100.json",
+    "20261025-230830-llm-c500o100.json",
 ]
 OUT = Path(__file__).resolve().parent.parent / "data" / "eval.json"
 

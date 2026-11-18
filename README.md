@@ -10,9 +10,11 @@ it says so. Runs entirely on your own computer: no API keys, no cloud, ₹0.**
 ![Python 3.11](https://img.shields.io/badge/python-3.11-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
-> Demo GIF: _placeholder (to be recorded)_. A real screen recording of the app is in
-> [`site/assets/app-recording.mp4`](site/assets/app-recording.mp4), and the project page
-> in [`site/`](site/README.md) walks through a real answer and its citation check.
+**Project page (live):** [Hugging Face](https://huggingface.co/spaces/pranavms04/pageproof) ·
+[GitHub Pages](https://pranavms04.github.io/AI_Engineering_Project/). It walks through real recorded
+answers, the citation check and the measured numbers. A screen recording of the app is in
+[`site/assets/app-recording.mp4`](site/assets/app-recording.mp4). The app itself runs on your own
+computer by design (free, private); see Quickstart.
 
 ## What it does
 
@@ -221,7 +223,7 @@ web/            3D web app: HTML/CSS/JS, three.js vendored (served by the API at
 ui/             Streamlit UI, the simpler fallback (HTTP client of the API)
 scripts/        build_index, search, ask
 evaluation/     dataset, metrics, run_eval, rescore, results/
-tests/          pytest suite (152 tests)
+tests/          pytest suite (156 tests)
 site/           static project page (real recorded data)
 docs/           spec, progress log, runbook, learning notes per phase
 ```
