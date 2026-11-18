@@ -1,4 +1,6 @@
-# AI Knowledge Assistant
+# PageProof
+
+_Answers from your documents, with the page to prove it._ (Repository: AI Knowledge Assistant.)
 
 **Ask questions about your own technical documents and get answers grounded only in
 them, with a citation for every claim. When the documents don't contain the answer,

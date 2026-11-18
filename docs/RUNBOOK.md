@@ -1,6 +1,6 @@
 # Runbook
 
-How to set up, run, rebuild and fix the AI Knowledge Assistant. Every problem in the
+How to set up, run, rebuild and fix PageProof (the AI Knowledge Assistant). Every problem in the
 troubleshooting table actually happened while building this project.
 
 ## 1. First-time setup (local)

@@ -1,4 +1,6 @@
-# CLAUDE.md — AI Knowledge Assistant
+# CLAUDE.md — PageProof (AI Knowledge Assistant)
+
+Product name: **PageProof** (renamed 2026-11-18). The repo and Python package names are unchanged.
 
 This file is read automatically at the start of every Claude Code session.
 Read it fully before doing anything. Full design: `docs/PROJECT_SPEC.md`.

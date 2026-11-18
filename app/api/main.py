@@ -44,7 +44,7 @@ CONTENT_SECURITY_POLICY = (
 )
 DOCS_PATHS = ("/docs", "/redoc", "/openapi.json")
 
-app = FastAPI(title="AI Knowledge Assistant", version="0.7.0", lifespan=lifespan)
+app = FastAPI(title="PageProof API", version="0.8.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,

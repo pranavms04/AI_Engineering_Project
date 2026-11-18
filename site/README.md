@@ -1,6 +1,6 @@
 # Project page
 
-A static landing page for the AI Knowledge Assistant. Open it through any static
+A static landing page for PageProof. Open it through any static
 file server (it also works from GitHub Pages):
 
 ```bash

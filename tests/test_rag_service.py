@@ -1,7 +1,7 @@
 import pytest
 from app.config import Settings
 from app.generation.llm_client import FakeLLMClient, LLMUnavailableError
-from app.generation.prompts import ABSTAIN_ANSWER
+from app.generation.prompts import ABSTAIN_ANSWER, PROMPT_VERSION
 from app.ingestion.chunking import Chunk
 from app.services.rag_service import MAX_QUESTION_CHARS, RAGService
 
@@ -36,7 +36,7 @@ def test_good_evidence_calls_llm_and_returns_cited_answer():
     assert result.invalid_citations == []
     assert result.sources[0].citation == "[fastapi.pdf, p. 2]"
     assert result.model == "fake-llm"
-    assert result.prompt_version == "v1"
+    assert result.prompt_version == PROMPT_VERSION
     assert set(result.timings_ms) == {"retrieve", "generate", "total"}
     assert result.timings_ms["total"] >= result.timings_ms["generate"]
 

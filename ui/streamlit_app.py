@@ -156,7 +156,7 @@ def show_notice() -> None:
 
 def render_sidebar() -> bool:
     """Draw the sidebar. Returns False if the API is down."""
-    st.sidebar.markdown("### :material/menu_book: Knowledge Assistant")
+    st.sidebar.markdown("### :material/fact_check: PageProof")
     health = get_health()
     if not health.ok:
         st.sidebar.badge("API offline", icon=":material/error:", color="red")
@@ -320,8 +320,8 @@ def render_chat() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="AI Knowledge Assistant", page_icon=":material/menu_book:")
-    st.title("AI Knowledge Assistant")
+    st.set_page_config(page_title="PageProof", page_icon=":material/fact_check:")
+    st.title("PageProof")
     st.caption("Answers only from your documents, with citations. Everything runs on this computer.")
 
     if not render_sidebar():

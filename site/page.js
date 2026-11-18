@@ -1,4 +1,4 @@
-/* AI Knowledge Assistant landing page.
+/* PageProof landing page.
    Every panel computes its state from window.KA_DATA (data/page-data.js), which is
    generated from real recorded answers and real evaluation results. Nothing about
    which citation fails, or where a sentence came from, is written by hand here. */

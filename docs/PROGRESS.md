@@ -101,6 +101,10 @@ Phase 10 Docker check (2026-10-27, Colima 2 CPU / 3 GB, Docker 29.5.2):
 - Ollama stopped: status "Ollama offline", 503 card with Try again. Static serving: 5 traversal probes all 404.
 - Not verifiable in the browser pane: smooth 60 fps motion (the pane throttles to ~2 fps when hidden) and the reduced-motion setting.
 
+Prompt v2 experiment (2026-11-18, 3 runs, rejected): replacing the example citation `[guide.pdf, p. 2]` with
+`[file-name, p. N]` did not fix q01 (still `p. 2` in 3/3 runs) and lowered citation accuracy to 0.760 / 0.826 / 0.792
+(v1: 0.870 / 0.905 / 0.895); the model invented file names for should-refuse questions (q28, q29). Kept v1.
+
 ## Bugs fixed (learning log)
 - 3D web app: the pinned map label and zoomed camera stayed on screen during the next question; fixed by clearing the label and easing the camera back on each new question.
 - 3D web app: after a rebuild some points were out of view, and fog hid points at the new distance; the camera now fits every point to the panel's shape and the fog follows the distance.

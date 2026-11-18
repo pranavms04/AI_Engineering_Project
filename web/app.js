@@ -45,7 +45,7 @@ const ICONS = {
   cross: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v5.5M12 16.5v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
   info: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v5.5M12 7.6v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
   search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4 4M8.5 11h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
-  book: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 8.5h9.5a3 3 0 0 1 3 3V24H12a3 3 0 0 1-3-3z" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  book: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 7.5h9l4.5 4.5V24.5H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 17l2.8 2.8L20 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 // Our own fixed SVG strings only, never text from the model or a document.
 const icon = (name) => {

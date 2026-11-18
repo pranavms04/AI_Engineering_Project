@@ -169,3 +169,21 @@ looked attractive. Measured with the LLM at MIN_SCORE 0.20 (2 runs: `20261025-22
 Results files contain questions, answers and retrieved page numbers/scores; review files contain
 answers. That is fine for the public FastAPI docs used here. **If you evaluate on personal documents,
 do not commit `evaluation/results/`.**
+
+## Experiment 3: prompt v2 (rejected, 2026-11-18)
+
+**Hypothesis:** q01 cites `p. 2` in every run although p. 2 is never retrieved; maybe the model copies
+the prompt's example citation `[guide.pdf, p. 2]`.
+**Change (one variable):** rule 3's example replaced with the placeholder `[file-name, p. N]`.
+**Same:** dataset, model, chunking, top_k, MIN_SCORE, machine. 3 runs each.
+
+| Prompt | Runs (results files) | Citation accuracy | Answers with an invalid citation |
+|---|---|---|---|
+| v1 | `20261025-230001`, `-230404`, `-230830` | 0.870 / 0.905 / 0.895 | 3 / 2 / 2 |
+| v2 | `20261118-103923`, `-104248`, `-104812` | 0.760 / 0.826 / 0.792 | 5 / 3 / 4 |
+
+- **q01 still cited `p. 2` in all 3 v2 runs**, so the example was not the cause. Hypothesis rejected.
+- v2 was worse: with a placeholder in the rule, the model **invented whole file names** for questions it
+  should refuse (q28 `fastapi-database.pdf, p. 10/11` in all 3 runs; q29 `docker-deployment-fastapi.pdf`).
+- **Decision:** kept v1. The v1 runs were recorded on 2026-10-25 and v2 on 2026-11-18 on the same machine
+  and code path; the gap (lowest v1 0.870 > highest v2 0.826) is larger than the run-to-run spread.
